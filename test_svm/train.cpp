@@ -76,6 +76,7 @@ int main(int argc, char **argv)
 
 	CvSVM svm;
 	svm.train(msamples, mlables);
+	svm.save("detlog/result.xml");
 
 	return 0;
 }
