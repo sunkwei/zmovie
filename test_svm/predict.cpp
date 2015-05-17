@@ -6,12 +6,7 @@
 
 int main(int argc, char **argv)
 {
-	const char *fname = "detlog/e00000030_16-17--3.yaml";
-	fname = "detlog/e00000064_21-27--2.yaml";
-	fname = "detlog/e00000107_12-24--3.yaml";
-	fname = "detlog/e00000106_13-25--3.yaml";
-	fname = "detlog/e00000031_15-16--3.yaml";
-	fname = "detlog/e00000162_16-17--1.yaml";
+	const char *fname = "verify/e00000030_16-17--3.yaml";
 
 	int label;
 	cv::Mat sample;
