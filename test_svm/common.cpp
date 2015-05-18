@@ -4,7 +4,7 @@
 
 bool load_sample(const char *fname, int &label, cv::Mat &m)
 {
-	const char *_sdir[] = { "right", "down", "left", "up", };
+	const char *_sdir[] = { "right", "down", "left", "up", "nothing"};
 	cv::Mat sample;
 
 	fprintf(stdout, "INFO: try load from %s\n", fname);
@@ -17,7 +17,7 @@ bool load_sample(const char *fname, int &label, cv::Mat &m)
 	fs["dir"] >> sdir;
 	fs["eigens"] >> sample;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 5; i++) {
 		if (sdir == _sdir[i]) {
 			label = i;
 			break;

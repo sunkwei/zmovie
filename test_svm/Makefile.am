@@ -6,5 +6,5 @@ train_SOURCES=	train.cpp common.cpp
 train_LDADD= ${opencv_LIBS} ${libccgnu2_LIBS}
 
 predict_SOURCES= predict.cpp common.cpp
-predict_LDADD= ${opencv_LIBS}
+predict_LDADD= ${opencv_LIBS} ${libccgnu2_LIBS}
 

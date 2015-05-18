@@ -2,25 +2,47 @@
 #include <stdlib.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/ml/ml.hpp>
+#include <cc++/file.h>
 #include "common.h"
 
 int main(int argc, char **argv)
 {
-	const char *fname = "verify/e00000030_16-17--3.yaml";
-
-	int label;
-	cv::Mat sample;
-	if (!load_sample(fname, label, sample)) {
-		fprintf(stderr, "ERR: can't load sample from %s\n", fname);
-		return -1;
-	}
+	ost::Dir dir("verify");
 
 	CvSVM svm;
 	svm.load("detlog/result.xml");
 
-	float idx = svm.predict(sample);
-	fprintf(stderr, "INFO: get index=%.1f\n", idx);
+	size_t total = 0, ok = 0;
 
+	while (dir.isValid()) {
+		const char *fname = dir++;
+		if (!fname) {
+			break;
+		}
+
+		if (!strcmp(ost::File::getExtension(fname), ".yaml")) {
+			int label;
+			cv::Mat sample;
+			char filename[256];
+
+			snprintf(filename, sizeof(filename), "verify/%s", fname);
+			if (load_sample(filename, label, sample)) {
+				total++;
+
+				int idx = (int)svm.predict(sample);
+				if (idx == label) {
+					fprintf(stderr, "O");
+					ok++;
+				}
+				else {
+					fprintf(stderr, "E");
+				}
+			}
+		}
+	}
+
+	fprintf(stderr, "test %u samples, and %u succeful!\n", total, ok);
+	
 	return 0;
 }
 
