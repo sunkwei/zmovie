@@ -15,8 +15,9 @@ struct Arguments
 
 static int parse_cmdline(int argc, char **argv, Arguments *args)
 {
-	int rc = 0;
+	fprintf(stderr, "parse_cmdline: argc=%d\n");
 
+	int rc = 0;
 	int arg = 1;
 	while (arg < argc) {
 		if (argv[arg][0] == '-') {
@@ -43,6 +44,7 @@ static int parse_cmdline(int argc, char **argv, Arguments *args)
 			}
 		}
 		else {
+			fprintf(stderr, "DEBUG: url=%s\n", argv[arg]);
 			args->url = argv[arg];
 		}
 
@@ -52,9 +54,13 @@ static int parse_cmdline(int argc, char **argv, Arguments *args)
 	return rc;
 }
 
+#ifdef main
+#	undef main
+#endif
+
 int main(int argc, char **argv)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
 		fprintf(stderr, "ERR: unable init sdl video sys\n");
 		return -1;
 	}

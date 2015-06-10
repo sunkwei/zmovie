@@ -49,8 +49,8 @@ int main(int argc, char **argv)
 	}
 
 #if 1
-	CvParamGrid CvParamGrid_C(pow(2.0, -5), pow(2.0, 5), 1.5);
-	CvParamGrid CvParamGrid_gamma(pow(2.0, -5), pow(2.0, 5), 1.5);
+	CvParamGrid CvParamGrid_C(pow(2.0, -5), pow(2.0, 5), 1.1);
+	CvParamGrid CvParamGrid_gamma(pow(2.0, -5), pow(2.0, 5), 1.1);
 	if (!CvParamGrid_C.check() || !CvParamGrid_gamma.check())
 		std::cout << "The grid is NOT VALID." << std::endl;
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	paramz.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 0.000001);
 
 	CvSVM svm;
-	svm.train_auto(msamples, mlables, cv::Mat(), cv::Mat(), paramz, 15, 
+	svm.train_auto(msamples, mlables, cv::Mat(), cv::Mat(), paramz, 10,
 		CvParamGrid_C, CvParamGrid_gamma, CvSVM::get_default_grid(CvSVM::P), 
 		CvSVM::get_default_grid(CvSVM::NU), CvSVM::get_default_grid(CvSVM::COEF),
 		CvSVM::get_default_grid(CvSVM::DEGREE), true);
