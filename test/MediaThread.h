@@ -1,5 +1,5 @@
 #pragma once
-#include "workingthread.h"
+#include "WorkingThread.h"
 #include "DecodeResult.h"
 #include <string>
 extern "C" {

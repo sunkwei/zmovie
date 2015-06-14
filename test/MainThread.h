@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cc++/thread.h>
-#include <sdl2/SDL.h>
-#include "workingthread.h"
+#include <SDL2/SDL.h>
+#include "WorkingThread.h"
 #include "DecodeResult.h"
 #include "MediaThread.h"
 #include <stack>

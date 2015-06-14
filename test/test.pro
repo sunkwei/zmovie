@@ -27,4 +27,4 @@ HEADERS += \
     zkrender.h \
     player.h
 
-LIBS += avformat.lib avcodec.lib avutil.lib SDL2.lib ccgnu2.lib
+LIBS += -lavformat -lavcodec -lswscale -lavutil -lSDL2 -lccgnu2

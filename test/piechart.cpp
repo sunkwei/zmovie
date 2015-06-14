@@ -2,7 +2,7 @@
 #include <QColor>
 #include <QPen>
 #include <QPainter>
-#include <sdl2/SDL.h>
+#include <SDL2/SDL.h>
 extern "C" {
 #   include <libavcodec/avcodec.h>
 #   include <libavformat/avformat.h>
