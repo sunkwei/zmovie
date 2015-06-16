@@ -10,6 +10,7 @@ class MyPlayer : public QQuickPaintedItem
 
 public:
     MyPlayer();
+    virtual void paint(QPainter *painter);
 };
 
 #endif // MYPLAYER_H

@@ -5,3 +5,7 @@ MyPlayer::MyPlayer()
 
 }
 
+void MyPlayer::paint(QPainter *painter)
+{
+
+}

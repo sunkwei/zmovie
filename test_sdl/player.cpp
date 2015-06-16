@@ -15,8 +15,6 @@ struct Arguments
 
 static int parse_cmdline(int argc, char **argv, Arguments *args)
 {
-	fprintf(stderr, "parse_cmdline: argc=%d\n");
-
 	int rc = 0;
 	int arg = 1;
 	while (arg < argc) {
@@ -112,7 +110,7 @@ int main(int argc, char **argv)
 		avcodec_open2(ctx, codec, 0);
 	}
 
-	
+	SDL_Window *win = SDL_CreateWindow("
 
 	return 0;
 }
