@@ -2,7 +2,8 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    myplayer.cpp
 
 RESOURCES += qml.qrc
 
@@ -11,3 +12,8 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
+
+win32: LIBS += -lavcodec -lavformat -lavutil -lswscale
+
+HEADERS += \
+    myplayer.h
