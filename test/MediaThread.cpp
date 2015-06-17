@@ -1,6 +1,18 @@
 #include "MediaThread.h"
 #include "DecodeResult.h"
 
+class FFmpegInit
+{
+public:
+    FFmpegInit()
+    {
+        av_register_all();
+        avcodec_register_all();
+    }
+};
+
+static FFmpegInit _ffmpeg_init;
+
 MediaThread::MediaThread(const char *url, DecodeResult *dr)
 	: url_(url)
 	, dr_(dr)
@@ -76,7 +88,7 @@ void MediaThread::run()
 		if (chk_req(0, &code)) {
 			if (code == 0) {
 				reply(0);
-				break;	// ½áÊø ...
+                break;
 			}
 		}
 

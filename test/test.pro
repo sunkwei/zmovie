@@ -2,13 +2,11 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-SOURCES += main.cpp \
-    piechart.cpp \
-    MainThread.cpp \
+SOURCES += \
     MediaThread.cpp \
     WorkingThread.cpp \
     player.cpp \
-    zkrender.cpp
+    main.cpp
 
 RESOURCES += qml.qrc
 
@@ -19,12 +17,12 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    piechart.h \
     DecodeResult.h \
-    MainThread.h \
     MediaThread.h \
     WorkingThread.h \
     zkrender.h \
     player.h
 
-LIBS += -lavformat -lavcodec -lswscale -lavutil -lSDL2 -lccgnu2
+linux: LIBS += -lavformat -lavcodec -lswscale -lavutil -lSDL2 -lccgnu2
+
+win32: LIBS += avformat.lib avcodec.lib swscale.lib avutil.lib ccgnu2.lib sdl2.lib

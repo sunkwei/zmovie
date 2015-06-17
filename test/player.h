@@ -1,13 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <cc++/thread.h>
 #include <QObject>
 #include <QQuickItem>
 #include <QQuickPaintedItem>
-#include "zkrender.h"
-#include "MediaThread.h"
-#include "DecodeResult.h"
-#include <cc++/thread.h>
 #include <deque>
 #include <stack>
 #include <QImage>
@@ -17,10 +14,18 @@ extern "C" {
 #   include <libswscale/swscale.h>
 }
 
+#include "zkrender.h"
+#include "DecodeResult.h"
+#include "MediaThread.h"
+
 inline double now()
 {
     timeval tv;
+#ifdef WIN32
+    ost::gettimeofday(&tv, 0);
+#else
     gettimeofday(&tv, 0);
+#endif
     return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
@@ -42,15 +47,12 @@ public:
     void paint(QPainter *painter);
 
 private:
-    /** MediaThread 回调，这里可以阻塞，以控制解码线程
-     */
     virtual int save_video_frame(const AVFrame *origin);
 
 private Q_SLOTS:
     void check_pending();
 
 private:
-    /** 缓冲的解码后的图像帧 */
     class SavedPicture
     {
     public:
@@ -79,15 +81,15 @@ private:
                 width = frame->width, height = frame->height;
                 if (sws) {
                     sws_freeContext(sws);
-                    sws = sws_getContext(frame->width, frame->height, (PixelFormat)frame->format,
-                                         width, height, AV_PIX_FMT_BGR24, SWS_FAST_BILINEAR, 0, 0, 0);
                 }
+                sws = sws_getContext(frame->width, frame->height, (PixelFormat)frame->format,
+                                     width, height, AV_PIX_FMT_BGR24, SWS_FAST_BILINEAR, 0, 0, 0);
 
                 if (pic.data[0]) {
                     avpicture_free(&pic);
                 }
 
-                avpicture_alloc(&pic, AV_PIX_FMT_RGB32, width, height);
+                avpicture_alloc(&pic, AV_PIX_FMT_ARGB, width, height);
 
                 delete image_;
                 image_ = new QImage(pic.data[0], width, height, QImage::Format_ARGB32);
@@ -97,6 +99,7 @@ private:
                       pic.data, pic.linesize);
 
             pts = frame->pts;
+            qDebug("pts: %u", pts);
         }
 
         int64_t stamp() const
@@ -151,7 +154,6 @@ private:
         cs_cache_.leave();
     }
 
-    // 检查是否需要播放一帧...
     bool chk_to_show();
 
     typedef std::deque<SavedPicture*> PICTURES;
@@ -159,15 +161,14 @@ private:
     ost::Mutex cs_fifo_, cs_cache_;
     ost::Event evt_fifo_, evt_cache_;
 
-    QTimer timer_; // 每隔10ms检查是否有需要显示的图像帧...
-    QImage *image_showing_; //
+    QTimer timer_;
+    QImage *image_showing_;
 
     QString url_;
     zkrender_t *render_;
-    MediaThread *thread_;   // 媒体线程..
+    MediaThread *thread_;
 
-    bool waiting_first_frame_;  // 为了同步...
-    double pts_delta_;  // now与frame pts的差值 ..
+    bool waiting_first_frame_;
+    double pts_delta_;
 };
-
 #endif // PLAYER_H

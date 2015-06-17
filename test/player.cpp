@@ -1,18 +1,21 @@
-#include "player.h"
+#define Player1
+
+#include <cc++/socket.h>
 #include <QQuickWindow>
 #include "zkrender.h"
 #include <QPainter>
+#include "player.h"
+#include <QDebug>
 
 Player::Player()
 {
     thread_ = 0;
+    image_showing_ = 0;
 
-    // 准备10个缓冲....
     for (int i = 0; i < 10; i++) {
         cache_.push_back(new SavedPicture);
     }
 
-    // Timer, 每隔10ms，检查 fifo_ 中第一帧图像的 pts，...
     timer_.setInterval(10);
     QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(check_pending()));
 }
@@ -48,10 +51,9 @@ QString Player::url() const
 
 void Player::play()
 {
-    // 启动工作线程，接收媒体数据，解码，保存到 cache_，在主线程中检查是否需要显示 ...
     waiting_first_frame_ = true;
     thread_ = new MediaThread(url_.toStdString().c_str(), this);
-    image_showing_ = false;
+    image_showing_ = 0;
     timer_.start();
 }
 
@@ -66,16 +68,19 @@ void Player::stop()
 void Player::paint(QPainter *painter)
 {
     if (image_showing_) {
-        // 显示
-        painter->drawImage(0, 0, *pending_next_image());
+        QImage *img = pending_next_image();
+        QRectF target(0, 0, width(), height());
+        QRectF src(0, 0, img->width(), img->height());
+        painter->drawImage(target, *img, src);
         release_pending_image();
+        qDebug("X");
     }
+
+    image_showing_ = 0;
 }
 
 void Player::check_pending()
 {
-    /** 检查 fifo_ 中的帧是否需要显示，是否过时 ....
-     */
     if (chk_to_show()) {
         image_showing_ = pending_next_image();
         update();
@@ -84,13 +89,14 @@ void Player::check_pending()
 
 bool Player::chk_to_show()
 {
+#if 0
     if (waiting_first_frame_) {
-        // 至少缓冲5帧再开始播放..
         if (pending_size() < 5) {
             return false;
         }
 
         pts_delta_ = now() - pending_next_pts();
+        waiting_first_frame_ = false;
     }
 
     if (pending_size() == 0) {
@@ -100,27 +106,28 @@ bool Player::chk_to_show()
     double fpts = pending_next_pts();
     double curr = now() - pts_delta_;
 
-    // TODO: 如果cpu能力不够，则会出现累积，需要主动扔帧 ...
-
     if (fpts <  curr) {
         return true;
     }
     else {
         return false;
     }
+#else
+    if (pending_size() > 0) {
+        return true;
+    }
+#endif //
 }
-
 
 int Player::save_video_frame(const AVFrame *origin)
 {
-    /** 保存到 QImage 中，并放入 fifo_, 在必要的时候显示 */
     cs_cache_.enter();
     while (cache_.empty()) {
         cs_cache_.leave();
         evt_cache_.wait();
         evt_cache_.reset();
 
-        /** TODO: 这里需要检查是否结束 ... */
+        // TODO: check quit
     }
 
     SavedPicture *sp = cache_.front();
@@ -131,7 +138,10 @@ int Player::save_video_frame(const AVFrame *origin)
 
     cs_fifo_.enter();
     fifo_.push_back(sp);
+    evt_fifo_.signal();
     cs_fifo_.leave();
+
+    qDebug("V");
 
     return 0;
 }

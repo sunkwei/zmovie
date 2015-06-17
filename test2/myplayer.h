@@ -29,7 +29,7 @@ signals:
     void urlChanged();
 
 private:
-    QString url_;
+    QString url_, info_;
     QTimer timer_;
     MediaThread *th_;
     QImage *img_rending_;

@@ -45,17 +45,27 @@ void MyPlayer::paint(QPainter *painter)
         img_rending_ = 0;
     }
     else {
-        painter->drawText(0, 50, url_);
+        if (info_.isEmpty()) {
+            painter->drawText(0, 50, url_);
+        }
+        else {
+            painter->drawText(10, 50, info_);
+        }
     }
 }
 
 void MyPlayer::play()
 {
     th_ = new MediaThread(url_.toStdString().c_str());
+    info_ = "loading ..." + url_;
+    update();
 }
 
 void MyPlayer::stop()
 {
     delete th_;
     th_ = 0;
+
+    info_ = "";
+    update();
 }

@@ -5,7 +5,7 @@ import QtQuick.Dialogs 1.2
 import zonekey.qd 1.1
 
 ApplicationWindow {
-    title: qsTr("Hello World")
+    title: qsTr("zonekey player testing")
     width: 1280
     height: 720
     visible: true
@@ -25,13 +25,24 @@ ApplicationWindow {
     }
 
     MainForm {
+        id: mf
         anchors.fill: parent
         button1.onClicked: player1.play()
         button2.onClicked: player1.stop()
         button3.onClicked: {
-            player1.rotation += 5;
+            timer1.start()
         }
 
+        Timer {
+            id: timer1;
+            interval: 1000
+            repeat: true
+            onTriggered: mf.timeChanged()
+        }
+
+        function timeChanged() {
+            player1.rotation += 3;
+        }
     }
 
     MessageDialog {

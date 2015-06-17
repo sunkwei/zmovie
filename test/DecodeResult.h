@@ -2,7 +2,6 @@
 
 extern "C" {
 #	include <libavcodec/avcodec.h>
-#	include <SDL2/SDL.h>
 }
 
 struct DecodeResult
