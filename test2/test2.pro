@@ -16,14 +16,15 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-win32: LIBS += -lavcodec -lavformat -lavutil -lswscale
+win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lccgnu2
 
 HEADERS += \
     myplayer.h \
     mediathread.h \
     decode_result.h \
     ffmpegwrap.h \
-    test_ffmpeg.h
+    test_ffmpeg.h \
+    utils.h
 
 macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil
 

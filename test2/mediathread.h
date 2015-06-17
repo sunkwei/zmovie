@@ -9,6 +9,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QImage>
+#include "utils.h"
 
 /** 启动工作线程，保存解码帧 ...
  */
@@ -78,7 +79,7 @@ public:
 
     double next_stamp()
     {
-        if (has_pending()) {
+        if (pending_size() > 0) {
             return first_pending_stamp();
         }
         else {
@@ -86,15 +87,17 @@ public:
         }
     }
 
-    // 如果有，则返回第一帧...
+    /** 如果是第一次调用，则等待至少缓冲中有 N 帧后，这样能尽量保证平滑 ...
+     */
     Picture *lock_picture()
     {
-        if (has_pending()) {
-            return next_picture();
+        if (first_lock_video_) {
+            if (pending_size() > 5) {
+                first_lock_video_ = false;
+                return next_picture();
+            }
         }
-        else {
-            return 0;
-        }
+        return 0;
     }
 
     void unlock_picture(Picture *p)
@@ -149,12 +152,12 @@ private:
         return p;
     }
 
-    bool has_pending()
+    size_t pending_size()
     {
         cs_fifo_.lock();
-        bool empty = fifo_.empty();
+        size_t s = fifo_.size();
         cs_fifo_.unlock();
-        return !empty;
+        return s;
     }
 
     double first_pending_stamp()
@@ -180,8 +183,21 @@ private:
         }
     }
 
+    void release_all_picture()
+    {
+        for (PICTURES::iterator it = fifo_.begin(); it != fifo_.end(); ++it) {
+            delete *it;
+        }
+        fifo_.clear();
+
+        for (PICTURES::iterator it = cache_.begin(); it != cache_.end(); ++it) {
+            delete *it;
+        }
+        cache_.clear();
+    }
+
 private:
-    bool quit_;
+    bool quit_, first_lock_video_;
     std::string url_;
     typedef std::deque<Picture*> PICTURES;
     PICTURES fifo_, cache_;
