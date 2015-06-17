@@ -1,15 +1,12 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
-extern "C" {
-#   include <libavformat/avformat.h>
-}
+#include "myplayer.h"
 
 int main(int argc, char *argv[])
 {
-    av_register_all();
-
     QApplication app(argc, argv);
 
+    qmlRegisterType<MyPlayer>("zonekey.qd", 1, 1, "Player");
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

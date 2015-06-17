@@ -4,7 +4,9 @@ QT += qml quick widgets
 
 SOURCES += main.cpp \
     myplayer.cpp \
-    mediathread.cpp
+    mediathread.cpp \
+    ffmpegwrap.cpp \
+    test_ffmpeg.cpp
 
 RESOURCES += qml.qrc
 
@@ -19,7 +21,9 @@ win32: LIBS += -lavcodec -lavformat -lavutil -lswscale
 HEADERS += \
     myplayer.h \
     mediathread.h \
-    decode_result.h
+    decode_result.h \
+    ffmpegwrap.h \
+    test_ffmpeg.h
 
 macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil
 
