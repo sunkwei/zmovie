@@ -30,12 +30,12 @@ MyPlayer::~MyPlayer()
 void MyPlayer::check_frame()
 {
     double now = util_now();
-//    check_audio_frame(now);
     check_video_frame(now);
 }
 
 void MyPlayer::check_audio_frame(double now)
 {
+#if 0
     // 每隔10毫秒，检查是否需要投递的声音 pcm ...
     if (first_audio_) {
         // 等待至少缓冲几帧声音之后，再开始 ...
@@ -70,6 +70,19 @@ void MyPlayer::check_audio_frame(double now)
             th_->unlock_pcm(pcm);
         }
     }
+#else
+    // 直接将音频数据写到 AudioBuffer 中...
+    if (th_->audio_pending_size() > 0) {
+        int bytes = th_->audio_pending_next_bytes();
+        if (ab_->idle_size() > bytes) {
+            MediaThread::Pcm *p = th_->lock_pcm();
+            int len;
+            unsigned char *data = (unsigned char*)p->data(len);
+            ab_->append(data, len);
+            th_->unlock_pcm(p);
+        }
+    }
+#endif
 }
 
 void MyPlayer::check_video_frame(double now)
@@ -111,14 +124,6 @@ void MyPlayer::check_video_frame(double now)
     }
 }
 
-void MyPlayer::playback_audio(MediaThread::Pcm *pcm)
-{
-    if (!audio_output_) {
-
-
-    }
-}
-
 void MyPlayer::paint(QPainter *painter)
 {
     if (img_rending_) {
@@ -148,6 +153,7 @@ void MyPlayer::play()
         th_ = new MediaThread(url_.toStdString().c_str());
 
         ab_ = new AudioBuffer(th_);
+        bool rc = ab_->open(QIODevice::ReadOnly);
         audio_output_->start(ab_);
 
         info_ = "loading ..." + url_;
@@ -173,12 +179,25 @@ void MyPlayer::stop()
 AudioBuffer::AudioBuffer(MediaThread *mt)
     : mt_(mt)
 {
-
+    head_ = tail_ = 0;
 }
 
 qint64 AudioBuffer::readData(char *data, qint64 maxlen)
 {
-    return 0;
+    // 从 MediaThread 中获取声音 ...
+    int bytes = maxlen < data_size() ? maxlen : data_size();
+    int de = CIRC_CNT_TO_END(head_, tail_, BUFSIZE);
+    if (de >= bytes) {
+        memcpy(data, buf_+tail_, bytes);
+    }
+    else {
+        memcpy(data, buf_+tail_, de);
+        memcpy(data+de, buf_, bytes-de);
+    }
+    tail_ += bytes;
+    tail_ %= BUFSIZ;
+
+    return bytes;
 }
 
 qint64 AudioBuffer::writeData(const char *data, qint64 len)

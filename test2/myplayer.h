@@ -6,13 +6,40 @@
 #include <QTimer>
 #include <QAudioOutput>
 #include <QIODevice>
+#include <assert.h>
 #include "mediathread.h"
+#include "circ_buf.h"
 
 class AudioBuffer : public QIODevice
 {
+#define BUFSIZE (64*1024)
     MediaThread *mt_;
+    bool first_audio_;
+    double stamp_audio_delta_;
+    char buf_[BUFSIZE];
+    int head_, tail_;
+
 public:
     AudioBuffer(MediaThread *mt);
+    void append(unsigned char *data, int len)
+    {
+        assert(idle_size() >= len);
+        int se = CIRC_SPACE_TO_END(head_, tail_, BUFSIZE);
+        if (se >= len) {
+            memcpy(buf_+head_, data, len);
+        }
+        else {
+            memcpy(buf_+head_, data, se);
+            memcpy(buf_, data+se, len-se);
+        }
+
+        head_ += len;
+        head_ %= BUFSIZ;
+    }
+
+    int idle_size() const { return CIRC_SPACE(head_, tail_, BUFSIZE); }
+    int data_size() const { return CIRC_SPACE(head_, tail_, BUFSIZE); }
+
 
 private:
     virtual qint64 readData(char *data, qint64 maxlen);
@@ -44,7 +71,6 @@ signals:
 private:
     void check_audio_frame(double now);
     void check_video_frame(double now);
-    void playback_audio(MediaThread::Pcm *pcm);
 
 private:
     QString url_, info_;

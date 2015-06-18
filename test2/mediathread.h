@@ -68,6 +68,7 @@ public:
     size_t audio_pending_size();
     double audio_pending_duration();
     double audio_pending_first_stamp();
+    int audio_pending_next_bytes(); // 返回fifo中第一个的字节长度 ...
     Pcm *lock_pcm();
     void unlock_pcm(Pcm *pcm);
 

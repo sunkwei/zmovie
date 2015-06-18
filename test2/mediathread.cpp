@@ -319,6 +319,16 @@ double MediaThread::audio_pending_first_stamp()
     return s;
 }
 
+int MediaThread::audio_pending_next_bytes()
+{
+    cs_audio_fifo_.lock();
+    assert(!audio_fifo_.empty());
+    int len;
+    audio_fifo_.front()->data(len);
+    cs_audio_fifo_.unlock();
+    return len;
+}
+
 MediaThread::Pcm *MediaThread::lock_pcm()
 {
     cs_audio_fifo_.lock();

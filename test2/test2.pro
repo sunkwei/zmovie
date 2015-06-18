@@ -24,9 +24,10 @@ HEADERS += \
     decode_result.h \
     ffmpegwrap.h \
     test_ffmpeg.h \
-    utils.h
+    utils.h \
+    circ_buf.h
 
-macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil
+macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil -lswresample
 
 INCLUDEPATH += /opt/local/include
 DEPENDPATH += /opt/local/include
