@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets
+QT += qml quick widgets multimedia
 
 SOURCES += main.cpp \
     myplayer.cpp \
@@ -16,7 +16,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lccgnu2
+win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2
 
 HEADERS += \
     myplayer.h \

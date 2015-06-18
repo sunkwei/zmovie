@@ -5,6 +5,9 @@ extern "C" {
 #   include <libavcodec/avcodec.h>
 #   include <libavformat/avformat.h>
 #   include <libswscale/swscale.h>
+#   include <libswresample/swresample.h>
+#   include <libavutil/avutil.h>
+#   include <libavutil/opt.h>
 }
 #include <string>
 
@@ -23,12 +26,13 @@ class ffmpegWrap
     SwsContext *sws_;
     AVFrame *frame_;
     AVPacket pkg_;
+    uint64_t audio_sample_cnt_;    // 为了计算时间戳 ...
 
 public:
     enum {
         RC_OK = 0,
         RC_FAILURE = -1,
-        RC_MEDIA_END = 1,   // 文件播放结束
+        RC_MEDIA_END = 1,   // 文件播放结束...
     };
 
     ffmpegWrap(const char *url, ffmpegDecoderCallback *cb);

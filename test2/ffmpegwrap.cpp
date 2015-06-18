@@ -23,6 +23,7 @@ ffmpegWrap::ffmpegWrap(const char *url, ffmpegDecoderCallback *cb)
     pkg_.data = 0;
     pkg_.size = 0;
     pkg_.buf = 0;
+    audio_sample_cnt_ = 0;
 }
 
 ffmpegWrap::~ffmpegWrap()
@@ -99,7 +100,10 @@ int ffmpegWrap::decode_frame(AVCodecContext *cc, AVPacket *pkt)
     if (cc->codec_type == AVMEDIA_TYPE_AUDIO) {
         rc = avcodec_decode_audio4(cc, frame_, &got, pkt);
         if (got) {
-            cb_->on_audio_frame(pkt->stream_index, frame_, 0.0);
+
+            double stamp = audio_sample_cnt_ * 1.0 / frame_->sample_rate;
+            cb_->on_audio_frame(pkt->stream_index, frame_, stamp);
+            audio_sample_cnt_ += frame_->nb_samples;
         }
 
         if (rc > 0) {
@@ -116,8 +120,9 @@ int ffmpegWrap::decode_frame(AVCodecContext *cc, AVPacket *pkt)
     else if (cc->codec_type == AVMEDIA_TYPE_VIDEO){
         rc = avcodec_decode_video2(cc, frame_, &got, pkt);
         if (got) {
-            double stamp = pkt->pts * 1.0 * cc->time_base.num / cc->time_base.den;
-            cb_->on_video_frame(pkt->stream_index, frame_, stamp*2);
+            double stamp = pkt->pts * 1.0 * cc->time_base.num /
+                    cc->time_base.den *cc->ticks_per_frame; // FIXME: * ticks_per_frame ...
+            cb_->on_video_frame(pkt->stream_index, frame_, stamp);
         }
 
         if (rc > 0) {
