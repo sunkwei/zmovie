@@ -10,6 +10,7 @@
 #include <QWaitCondition>
 #include <QImage>
 #include "utils.h"
+#include <assert.h>
 
 /** 启动工作线程，保存解码帧 ...
  */
@@ -77,29 +78,49 @@ public:
         }
     };
 
-    double next_stamp()
+    // 返回等待 render 的图片的数目 ..
+    size_t pending_size()
     {
-        if (pending_size() > 0) {
-            return first_pending_stamp();
-        }
-        else {
-            return 0x7ffffff;   // FIXME:
-        }
+        cs_fifo_.lock();
+        size_t s = fifo_.size();
+        cs_fifo_.unlock();
+        return s;
     }
 
-    /** 如果是第一次调用，则等待至少缓冲中有 N 帧后，这样能尽量保证平滑 ...
-     */
+    // 返回缓冲包的时间延迟...
+    double pending_duration()
+    {
+        double duration = 0.0;
+        cs_fifo_.lock();
+        if (fifo_.size() > 1) {
+            duration = fifo_.back()->stamp() - fifo_.front()->stamp();
+        }
+        cs_fifo_.unlock();
+        return duration;
+    }
+
+    // 返回缓冲中的第一个时间戳 ...
+    double pending_first_stamp()
+    {
+        cs_fifo_.lock();
+        assert(!fifo_.empty());
+        double stamp = fifo_.front()->stamp();
+        cs_fifo_.unlock();
+        return stamp;
+    }
+
+    // 从 fifo 中取出 ...
     Picture *lock_picture()
     {
-        if (first_lock_video_) {
-            if (pending_size() > 5) {
-                first_lock_video_ = false;
-                return next_picture();
-            }
-        }
-        return 0;
+        cs_fifo_.lock();
+        assert(!fifo_.empty());
+        Picture *p = fifo_.front();
+        fifo_.pop_front();
+        cs_fifo_.unlock();
+        return p;
     }
 
+    // 使用完成 ...
     void unlock_picture(Picture *p)
     {
         save_freed_picture(p);
@@ -113,8 +134,13 @@ private:
     Picture *next_freed_picture()
     {
         cs_cache_.lock();
-        while (cache_.empty()) {
+        while (cache_.empty() && !quit_) {
             cache_not_empty_.wait(&cs_cache_);
+        }
+
+        if (quit_) {
+            cs_cache_.unlock();
+            return 0;
         }
 
         Picture *p = cache_.front();
@@ -141,8 +167,13 @@ private:
     Picture *next_picture()
     {
         cs_fifo_.lock();
-        while (fifo_.empty()) {
+        while (fifo_.empty() && !quit_) {
             fifo_not_empty_.wait(&cs_fifo_);
+        }
+
+        if (quit_) {
+            cs_fifo_.unlock();
+            return 0;
         }
 
         Picture *p = fifo_.front();
@@ -150,14 +181,6 @@ private:
         cs_fifo_.unlock();
 
         return p;
-    }
-
-    size_t pending_size()
-    {
-        cs_fifo_.lock();
-        size_t s = fifo_.size();
-        cs_fifo_.unlock();
-        return s;
     }
 
     double first_pending_stamp()
@@ -197,7 +220,7 @@ private:
     }
 
 private:
-    bool quit_, first_lock_video_;
+    bool quit_;
     std::string url_;
     typedef std::deque<Picture*> PICTURES;
     PICTURES fifo_, cache_;

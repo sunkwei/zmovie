@@ -117,7 +117,7 @@ int ffmpegWrap::decode_frame(AVCodecContext *cc, AVPacket *pkt)
         rc = avcodec_decode_video2(cc, frame_, &got, pkt);
         if (got) {
             double stamp = pkt->pts * 1.0 * cc->time_base.num / cc->time_base.den;
-            cb_->on_video_frame(pkt->stream_index, frame_, stamp);
+            cb_->on_video_frame(pkt->stream_index, frame_, stamp*2);
         }
 
         if (rc > 0) {

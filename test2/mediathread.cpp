@@ -4,21 +4,21 @@ MediaThread::MediaThread(const char *url)
     : url_(url)
 {
     quit_ = false;
-    prepare_cache(10);
+    prepare_cache(30);
     start();
 }
 
 MediaThread::~MediaThread()
 {
     quit_ = true;
+    fifo_not_empty_.wakeAll();
+    cache_not_empty_.wakeAll();
     wait();
     release_all_picture();
 }
 
 void MediaThread::run()
 {
-    first_lock_video_ = true;
-
     ffmpegWrap fr(url_.c_str(), this);
     while (!quit_) {
         int rc = fr.run_once();
@@ -29,6 +29,8 @@ void MediaThread::run()
             }
         }
     }
+
+    qDebug("mediaThread terminated!");
 }
 
 int MediaThread::on_audio_frame(int idx, const AVFrame *frame, double stamp)
@@ -39,8 +41,9 @@ int MediaThread::on_audio_frame(int idx, const AVFrame *frame, double stamp)
 int MediaThread::on_video_frame(int idx, const AVFrame *frame, double stamp)
 {
     Picture *p = next_freed_picture();
-    p->save(frame, stamp);
-    save_data_picture(p);
-    
+    if (p) {
+        p->save(frame, stamp);
+        save_data_picture(p);
+    }
     return 0;
 }

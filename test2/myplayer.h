@@ -32,7 +32,9 @@ private:
     QString url_, info_;
     QTimer timer_;
     MediaThread *th_;
-    QImage *img_rending_;
+    MediaThread::Picture *img_rending_;
+    bool first_video_;
+    double stamp_video_delta_;
 };
 
 #endif // MYPLAYER_H

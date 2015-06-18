@@ -27,7 +27,10 @@ ApplicationWindow {
     MainForm {
         id: mf
         anchors.fill: parent
-        button1.onClicked: player1.play()
+        button1.onClicked: {
+            player1.url = "C:/Users/sunkw/kuaipan/videos/IMG_0418.MOV";
+            player1.play();
+        }
         button2.onClicked: player1.stop()
         button3.onClicked: {
             timer1.start()
