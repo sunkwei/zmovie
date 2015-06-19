@@ -13,6 +13,8 @@ MediaThread::~MediaThread()
     quit_ = true;
     video_fifo_not_empty_.wakeAll();
     video_cache_not_empty_.wakeAll();
+    audio_fifo_not_empty_.wakeAll();
+    audio_cache_not_empty_.wakeAll();
     wait();
     release_all_buf();
 }
@@ -176,7 +178,7 @@ void MediaThread::save_data_picture(MediaThread::Picture *p)
 {
     cs_video_fifo_.lock();
     video_fifo_.push_back(p);
-    std::sort(video_fifo_.begin(), video_fifo_.end(), op_comp_stamp); // 按照 pts 时间戳排序
+    std::sort(video_fifo_.begin(), video_fifo_.end(), op_comp_stamp);
     video_fifo_not_empty_.wakeAll();
     cs_video_fifo_.unlock();
 }
@@ -270,6 +272,10 @@ void MediaThread::Pcm::save(const AVFrame *frame, double stamp)
 {
     stamp_ = stamp;
 
+#if 0
+    memset(buf_, 0, 4096);
+    data_len_ = 4096;
+#else
     if (!swr_) {
         // 总是输出 2, s16, 32000 ...
         swr_ = swr_alloc_set_opts(0, AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, 32000,
@@ -277,8 +283,10 @@ void MediaThread::Pcm::save(const AVFrame *frame, double stamp)
                                   0, 0);
 
         ch_ = 2;
-        samplerate_ = frame->sample_rate;
+        samplerate_ = 32000;
         bitsize_ = 16;
+
+        swr_init(swr_);
     }
 
     size_t out_size = frame->nb_samples * 2 * 2;    // samples * bytes per sample * channels
@@ -287,8 +295,10 @@ void MediaThread::Pcm::save(const AVFrame *frame, double stamp)
         buf_len_ = out_size;
     }
 
-    int samples = swr_convert(swr_, &buf_, frame->nb_samples, (const uint8_t**)frame->data, frame->nb_samples);
+    int samples = swr_convert(swr_, &buf_, frame->nb_samples, (const uint8_t**)frame->extended_data, frame->nb_samples);
     data_len_ = samples * 2 * 2;    // samples * bytes per sample * channels
+
+#endif
 }
 
 size_t MediaThread::audio_pending_size()
@@ -351,7 +361,6 @@ int MediaThread::on_audio_frame(int idx, const AVFrame *frame, double stamp)
 {
     Pcm *p = next_freed_pcm();
     if (p) {
-        qDebug("audio_stamp: %.3f", stamp);
         p->save(frame, stamp);
         save_data_pcm(p);
     }

@@ -10,21 +10,27 @@
 #include "mediathread.h"
 #include "circ_buf.h"
 
+#define AU_BUFSIZE (64*1024)
 class AudioBuffer : public QIODevice
 {
-#define BUFSIZE (64*1024)
+    bool first_audio_;  // 一开始，等待缓冲的数据足够多时，再开始填充 ...
     MediaThread *mt_;
-    bool first_audio_;
     double stamp_audio_delta_;
-    char buf_[BUFSIZE];
+    char buf_[AU_BUFSIZE];
     int head_, tail_;
 
 public:
     AudioBuffer(MediaThread *mt);
+
+    int idle_size() const { return CIRC_SPACE(head_, tail_, AU_BUFSIZE); }
+    int data_size() const { return CIRC_CNT(head_, tail_, AU_BUFSIZE); }
+
+private:
     void append(unsigned char *data, int len)
     {
         assert(idle_size() >= len);
-        int se = CIRC_SPACE_TO_END(head_, tail_, BUFSIZE);
+
+        int se = CIRC_SPACE_TO_END(head_, tail_, AU_BUFSIZE);
         if (se >= len) {
             memcpy(buf_+head_, data, len);
         }
@@ -33,15 +39,28 @@ public:
             memcpy(buf_, data+se, len-se);
         }
 
-        head_ += len;
-        head_ %= BUFSIZ;
+        head_ = (head_ + len) & (AU_BUFSIZE-1);
     }
 
-    int idle_size() const { return CIRC_SPACE(head_, tail_, BUFSIZE); }
-    int data_size() const { return CIRC_SPACE(head_, tail_, BUFSIZE); }
+    // 尽量填充本地 buf
+    void load_from_mt()
+    {
+        while (mt_->audio_pending_size() > 0) {
+            int bytes = mt_->audio_pending_next_bytes();
+            if (idle_size() >= bytes) {
+                MediaThread::Pcm *pcm = mt_->lock_pcm();
+                int len;
+                void *p = pcm->data(len);
+                assert(len == bytes);
+                append((unsigned char*)p, len);
+                mt_->unlock_pcm(pcm);
+            }
+            else {
+                break;
+            }
+        }
+    }
 
-
-private:
     virtual qint64 readData(char *data, qint64 maxlen);
     virtual qint64 writeData(const char *data, qint64 len);
 };
@@ -69,7 +88,6 @@ signals:
     void urlChanged();
 
 private:
-    void check_audio_frame(double now);
     void check_video_frame(double now);
 
 private:

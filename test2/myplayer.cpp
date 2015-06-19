@@ -1,10 +1,11 @@
 #include "myplayer.h"
 #include <QPainter>
+#include <stdio.h>
 
 MyPlayer::MyPlayer()
 {
     img_rending_ = 0;
-    timer_.setInterval(10); // 每隔10ms，查询是否需要刷新 ...
+    timer_.setInterval(10);
     QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(check_frame()));
 
     th_ = 0;
@@ -31,58 +32,6 @@ void MyPlayer::check_frame()
 {
     double now = util_now();
     check_video_frame(now);
-}
-
-void MyPlayer::check_audio_frame(double now)
-{
-#if 0
-    // 每隔10毫秒，检查是否需要投递的声音 pcm ...
-    if (first_audio_) {
-        // 等待至少缓冲几帧声音之后，再开始 ...
-        if (th_->audio_pending_duration() > 0.3) {
-            first_audio_ = false;
-            stamp_audio_delta_ = now - th_->audio_pending_first_stamp();
-            qDebug("pending audio duration:%.3f, size:%u", th_->audio_pending_duration(), th_->audio_pending_size());
-        }
-        else {
-            return;
-        }
-    }
-
-    if (th_->audio_pending_size() == 0) {
-        //
-        first_audio_ = true;
-        qDebug("audio underflow ...");
-    }
-    else {
-        double stamp = th_->audio_pending_first_stamp();
-        if (now - stamp_audio_delta_ > stamp) {
-            MediaThread::Pcm *p = th_->lock_pcm();
-            playback_audio(p);
-            th_->unlock_pcm(p);
-        }
-    }
-    assert(th_);
-    if (th_->audio_pending_size() > 2) {
-        MediaThread::Pcm *pcm = th_->lock_pcm();
-        if (pcm) {
-            // playback;
-            th_->unlock_pcm(pcm);
-        }
-    }
-#else
-    // 直接将音频数据写到 AudioBuffer 中...
-    if (th_->audio_pending_size() > 0) {
-        int bytes = th_->audio_pending_next_bytes();
-        if (ab_->idle_size() > bytes) {
-            MediaThread::Pcm *p = th_->lock_pcm();
-            int len;
-            unsigned char *data = (unsigned char*)p->data(len);
-            ab_->append(data, len);
-            th_->unlock_pcm(p);
-        }
-    }
-#endif
 }
 
 void MyPlayer::check_video_frame(double now)
@@ -126,7 +75,7 @@ void MyPlayer::check_video_frame(double now)
 
 void MyPlayer::paint(QPainter *painter)
 {
-    if (img_rending_) {
+    if (img_rending_ && th_) {
         QRectF r(0, 0, width(), height());
         painter->drawImage(r, *img_rending_->image());
         th_->unlock_picture(img_rending_);
@@ -168,6 +117,11 @@ void MyPlayer::stop()
 
         timer_.stop();
 
+        if (img_rending_) {
+            th_->unlock_picture(img_rending_);
+            img_rending_ = 0;
+        }
+
         delete th_;
         th_ = 0;
 
@@ -180,13 +134,46 @@ AudioBuffer::AudioBuffer(MediaThread *mt)
     : mt_(mt)
 {
     head_ = tail_ = 0;
+    first_audio_ = true;
+}
+
+static qint64 silence(char *data, qint64 maxlen)
+{
+    int n = maxlen > 1024 ? 1024 : maxlen;
+    memset(data, 0, n);
+    return n;
 }
 
 qint64 AudioBuffer::readData(char *data, qint64 maxlen)
 {
-    // 从 MediaThread 中获取声音 ...
-    int bytes = maxlen < data_size() ? maxlen : data_size();
-    int de = CIRC_CNT_TO_END(head_, tail_, BUFSIZE);
+    // TODO: 这里根据音频数据的消耗，可以计算音频时间戳，并用于视频同步 ...
+
+    load_from_mt(); // 总是尽量填充
+
+    if (first_audio_) {
+        // 多积累点儿声音数据，再开始投递 ...
+        if (data_size() > 16*1024) {
+            first_audio_ = false;
+        }
+        else {
+            return silence(data, maxlen);
+        }
+    }
+
+    if (maxlen <= 0) {
+        return maxlen;
+    }
+
+    int bytes = maxlen <= data_size() ? maxlen : data_size();
+    if (bytes < 512) {
+        first_audio_ = true;
+        qDebug("silence ...");
+
+        // 返回静音数据 ...
+        return silence(data, maxlen);
+    }
+
+    int de = CIRC_CNT_TO_END(head_, tail_, AU_BUFSIZE);
     if (de >= bytes) {
         memcpy(data, buf_+tail_, bytes);
     }
@@ -194,8 +181,7 @@ qint64 AudioBuffer::readData(char *data, qint64 maxlen)
         memcpy(data, buf_+tail_, de);
         memcpy(data+de, buf_, bytes-de);
     }
-    tail_ += bytes;
-    tail_ %= BUFSIZ;
+    tail_ = (tail_+bytes) & (AU_BUFSIZE-1);
 
     return bytes;
 }
