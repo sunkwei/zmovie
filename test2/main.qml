@@ -3,6 +3,8 @@ import QtQuick.Controls 1.3
 import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
 import zonekey.qd 1.1
+import QtQuick.Layouts 1.1
+import QtWebKit 3.0
 
 ApplicationWindow {
     title: qsTr("zonekey player testing")
@@ -27,24 +29,27 @@ ApplicationWindow {
     MainForm {
         id: mf
         anchors.fill: parent
+
         button1.onClicked: {
             //player1.url = "C:/Users/sunkw/kuaipan/videos/IMG_0418.MOV";
             player1.play();
         }
+
         button2.onClicked: player1.stop()
-        button3.onClicked: {
-            timer1.start()
+
+        browser.onNavigationRequested: mf.onRequest;
+
+        function onRequest(req)
+        {
+            browser.url = req.url
         }
 
-        Timer {
-            id: timer1;
-            interval: 1000
-            repeat: true
-            onTriggered: mf.timeChanged()
+        button_home.onClicked: {
+            browser.url = "http://172.16.1.10"
         }
 
-        function timeChanged() {
-            player1.rotation += 3;
+        button_refresh.onClicked: {
+            browser.url = input_url.text
         }
     }
 
