@@ -10,6 +10,12 @@ SOURCES += main.cpp \
 
 RESOURCES += qml.qrc
 
+mac {
+    QT_CONFIG -= no-pkg-config
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libavcodec libavformat libswscale libswresample
+}
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -27,7 +33,7 @@ HEADERS += \
     utils.h \
     circ_buf.h
 
-macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil -lswresample
+# macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil -lswresample
 
-INCLUDEPATH += /opt/local/include
-DEPENDPATH += /opt/local/include
+#INCLUDEPATH += /opt/local/include
+#DEPENDPATH += /opt/local/include
