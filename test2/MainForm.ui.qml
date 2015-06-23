@@ -12,6 +12,7 @@ Item {
     property alias button2: button2
     property alias button1: button1
     property alias player1: player1
+    property alias player2: player2
     property alias browser: webView1
     property alias input_url: input_url
     property alias button_refresh: button_refresh
@@ -38,10 +39,9 @@ Item {
 
         Player {
             id: player1
-            x: 300
+            //x: 300
             width: 480
             height: 270
-            rotation: 0
             fillColor: "#ff0000"
             url: "rtsp://172.16.1.52/av0_0"
             cl_enabled: true
@@ -53,6 +53,15 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
             }
+        }
+
+        Player {
+            id: player2
+            width: 480
+            height: 270
+            fillColor: "#ffff00"
+            url: "rtsp://172.16.1.52/av0_0"
+            cl_enabled: false
         }
     }
 

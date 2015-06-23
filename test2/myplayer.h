@@ -73,6 +73,7 @@ class MyPlayer : public QQuickPaintedItem
     Q_OBJECT
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(bool cl_enabled READ cl_enabled WRITE cl_setEnabled NOTIFY cl_enabledChanged)
+    Q_PROPERTY(double cache_duration READ cache_duration WRITE setCache_duration NOTIFY cache_durationChanged)
 
 public:
     MyPlayer();
@@ -84,6 +85,9 @@ public:
 
     bool cl_enabled() const { return cl_enabled_; }
     void cl_setEnabled(bool enable) { cl_enabled_ = enable; }
+
+    double cache_duration() const { return duration_; }
+    void setCache_duration(double d) { duration_ = d; }
 
 
     Q_INVOKABLE void play();
@@ -98,10 +102,12 @@ public:
 private slots:
     void when_check_frame();
     void when_cl_enabledChanged();
+    void when_cache_durationChanged();
 
 signals:
     void urlChanged();
     void cl_enabledChanged();
+    void cache_durationChanged();
 
 private:
     void check_video_frame(double now);
@@ -119,6 +125,8 @@ private:
 
     bool cl_enabled_;
     std::deque<QPoint> cl_points_;
+
+    double duration_;
 
     KVConfig *cfg_;
 };

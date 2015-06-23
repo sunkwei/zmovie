@@ -28,6 +28,9 @@ MyPlayer::MyPlayer()
     cl_enabled_ = false;
 
     load_calibration_data();
+
+    /** 设置默认缓冲时间 .. */
+    duration_ = 0.3;
 }
 
 MyPlayer::~MyPlayer()
@@ -42,6 +45,11 @@ void MyPlayer::when_check_frame()
     check_video_frame(now);
 }
 
+void MyPlayer::when_cache_durationChanged()
+{
+
+}
+
 void MyPlayer::check_video_frame(double now)
 {
     // 每隔10ms，检查是否有需要 render 的图像 ...
@@ -49,7 +57,7 @@ void MyPlayer::check_video_frame(double now)
 
     if (first_video_) {
         // 等待至少缓冲几帧之后，再开始真正的播放，这样能够更平滑 ...
-        if (th_->video_pending_duration() > 0.3) {
+        if (th_->video_pending_duration() > duration_) {
             first_video_ = false;
             stamp_video_delta_ = now - th_->video_pending_first_stamp();
             qDebug("pending video duration %.3f, size=%u", th_->video_pending_duration(), th_->video_pending_size());
@@ -194,7 +202,7 @@ qint64 AudioBuffer::readData(char *data, qint64 maxlen)
 
     if (first_audio_) {
         // 多积累点儿声音数据，再开始投递 ...
-        if (data_size() > 16*1024) {
+        if (data_size() > 8*1024) {
             first_audio_ = false;
         }
         else {

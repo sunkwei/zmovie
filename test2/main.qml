@@ -37,9 +37,10 @@ ApplicationWindow {
 
         button1.onClicked: {
             player1.url = kvc.get("video_source");
-            messageDialog.show("try to open source:" + player1.url);
             player1.play();
-            player1.cl_pop_point()
+
+            player2.url = kvc.get("video_source_tracing");
+            player2.play();
         }
 
         button2.onClicked: player1.stop()
