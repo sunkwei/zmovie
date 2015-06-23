@@ -1,12 +1,17 @@
 #include "myplayer.h"
 #include <QPainter>
 #include <stdio.h>
+#include <QRect>
+#include <QPen>
 
 MyPlayer::MyPlayer()
 {
+    cfg_ = _cfg;
+
     img_rending_ = 0;
     timer_.setInterval(10);
-    QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(check_frame()));
+    QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(when_check_frame()));
+    QObject::connect(this, SIGNAL(cl_enabledChanged()), this, SLOT(when_cl_enabledChanged()));
 
     th_ = 0;
 
@@ -20,6 +25,9 @@ MyPlayer::MyPlayer()
 
     audio_output_ = new QAudioOutput(fmt, this);
     ab_ = 0;
+    cl_enabled_ = false;
+
+    load_calibration_data();
 }
 
 MyPlayer::~MyPlayer()
@@ -28,7 +36,7 @@ MyPlayer::~MyPlayer()
     delete audio_output_;
 }
 
-void MyPlayer::check_frame()
+void MyPlayer::when_check_frame()
 {
     double now = util_now();
     check_video_frame(now);
@@ -77,7 +85,41 @@ void MyPlayer::paint(QPainter *painter)
 {
     if (img_rending_ && th_) {
         QRectF r(0, 0, width(), height());
-        painter->drawImage(r, *img_rending_->image());
+        QImage *img = img_rending_->image();
+
+        // 画标定线 ...
+        if (cl_enabled() && !cl_points_.empty()) {
+            QPen pen(QColor(0, 255, 0)), pent(QColor(255, 0, 0));
+            pen.setWidth(3), pent.setWidth(3);
+
+            QPainter p;
+            p.begin(img);
+            std::deque<QPoint>::const_iterator it = cl_points_.begin(), it0 = it;
+
+            int x0 = it0->x() * img->width() / width(), x = x0;
+            int y0 = it0->y() * img->height() / height(), y = y0;
+
+            p.setPen(pen);
+            p.drawRect(x0-5, y0-5, 10, 10);
+
+            for (++it; it != cl_points_.end(); ++it, ++it0) {
+                int x = it->x() * img->width() / width();
+                int y = it->y() * img->height() / height();
+
+                p.drawLine(QPoint(x0, y0), QPoint(x, y));
+
+                x0 = x, y0 = y;
+            }
+
+            if (x != x0 || y != y0) {
+                p.setPen(pent);
+                p.drawLine(QPoint(x, y), QPoint(x0, y0));
+            }
+
+            p.end();
+        }
+
+        painter->drawImage(r, *img);
         th_->unlock_picture(img_rending_);
         img_rending_ = 0;
     }
@@ -190,4 +232,70 @@ qint64 AudioBuffer::writeData(const char *data, qint64 len)
 {
     assert(0);
     return 0;
+}
+
+void MyPlayer::load_calibration_data()
+{
+    char *p = ::strdup(cfg_->get_value("calibration_data", ""));
+    char *q = strtok(p, ";");
+    while (q) {
+        int x, y;
+        if (sscanf(q, "%d,%d", &x, &y) == 2) {
+            cl_points_.push_back(QPoint(x, y));
+        }
+
+        q = strtok(0, ";");
+    }
+    free(p);
+}
+
+void MyPlayer::when_cl_enabledChanged()
+{
+    if (cl_enabled()) {
+
+    }
+    else {
+
+    }
+}
+
+int MyPlayer::cl_points()
+{
+    return cl_points_.size();
+}
+
+void MyPlayer::cl_push_point(int x, int y)
+{
+    if (cl_enabled()) {
+        cl_points_.push_back(QPoint(x, y));
+    }
+}
+
+void MyPlayer::cl_pop_point()
+{
+    if (cl_enabled() && !cl_points_.empty()) {
+        cl_points_.pop_back();
+    }
+}
+
+void MyPlayer::cl_remove_all_points()
+{
+    cl_points_.clear();
+}
+
+void MyPlayer::cl_save()
+{
+    if (cl_enabled()) {
+        std::stringstream ss;
+        for (int i = 0; i < cl_points_.size(); i++) {
+            int x = cl_points_[i].x() * atoi(cfg_->get_value("video_width", "480")) / width();
+            int y = cl_points_[i].y() * atoi(cfg_->get_value("video_height", "270")) / height();
+            ss << x << ',' << y << ';';
+        }
+
+        std::string cd = ss.str();
+
+        cfg_->set_value("calibration_data", cd.c_str());
+        cfg_->save_as();
+    }
 }

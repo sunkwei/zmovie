@@ -9,6 +9,9 @@
 #include <assert.h>
 #include "mediathread.h"
 #include "circ_buf.h"
+#include "kvconfig.h"
+
+extern KVConfig *_cfg;
 
 #define AU_BUFSIZE (64*1024)
 class AudioBuffer : public QIODevice
@@ -69,6 +72,7 @@ class MyPlayer : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(bool cl_enabled READ cl_enabled WRITE cl_setEnabled NOTIFY cl_enabledChanged)
 
 public:
     MyPlayer();
@@ -78,17 +82,30 @@ public:
     QString url() const { return url_; }
     void setUrl(const QString &url) { url_ = url; }
 
+    bool cl_enabled() const { return cl_enabled_; }
+    void cl_setEnabled(bool enable) { cl_enabled_ = enable; }
+
+
     Q_INVOKABLE void play();
     Q_INVOKABLE void stop();
 
+    Q_INVOKABLE void cl_push_point(int x, int y);
+    Q_INVOKABLE void cl_pop_point();
+    Q_INVOKABLE void cl_remove_all_points();
+    Q_INVOKABLE int cl_points();
+    Q_INVOKABLE void cl_save();
+
 private slots:
-    void check_frame();
+    void when_check_frame();
+    void when_cl_enabledChanged();
 
 signals:
     void urlChanged();
+    void cl_enabledChanged();
 
 private:
     void check_video_frame(double now);
+    void load_calibration_data();
 
 private:
     QString url_, info_;
@@ -99,6 +116,11 @@ private:
     double stamp_video_delta_, stamp_audio_delta_;
     QAudioOutput *audio_output_;
     AudioBuffer *ab_;
+
+    bool cl_enabled_;
+    std::deque<QPoint> cl_points_;
+
+    KVConfig *cfg_;
 };
 
 #endif // MYPLAYER_H
