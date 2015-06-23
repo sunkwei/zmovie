@@ -1,11 +1,11 @@
-#include "kvconfig.h"
+#include "kvconfig2.h"
 
-KVConfig::KVConfig()
+KVConfig2::KVConfig2()
 {
 
 }
 
-KVConfig::KVConfig(const char *fname, const char *base_url)
+KVConfig2::KVConfig2(const char *fname, const char *base_url)
 {
     fname_ = fname;
     fsession_name_ = fname_ + ".session";
@@ -31,7 +31,7 @@ static char *strim(char *p)
     return q;
 }
 
-void KVConfig::load(const char *fname)
+void KVConfig2::load(const char *fname)
 {
     FILE *fp = fopen(fname, "r");
     if (fp) {
@@ -55,7 +55,7 @@ void KVConfig::load(const char *fname)
     }
 }
 
-const char *KVConfig::get_value(const char *key, const char *def)
+const char *KVConfig2::get_value(const char *key, const char *def)
 {
     KVS::const_iterator itf = kvs_.find(key);
     if (itf == kvs_.end()) {
@@ -66,26 +66,26 @@ const char *KVConfig::get_value(const char *key, const char *def)
     }
 }
 
-void KVConfig::set_value(const char *key, const char *value)
+void KVConfig2::set_value(const char *key, const char *value)
 {
     kvs_[key] = value;
 }
 
-void KVConfig::set_value(const char *key, double value)
+void KVConfig2::set_value(const char *key, double value)
 {
     char buf[32];
     sprintf(buf, "%f", value);
     set_value(key, buf);
 }
 
-void KVConfig::set_value(const char *key, int value)
+void KVConfig2::set_value(const char *key, int value)
 {
     char buf[16];
     sprintf(buf, "%d", value);
     set_value(key, buf);
 }
 
-int KVConfig::save_as(const char *fname)
+int KVConfig2::save_as(const char *fname)
 {
     if (!fname) {
         fname = fsession_name_.c_str();
@@ -105,12 +105,12 @@ int KVConfig::save_as(const char *fname)
     return 0;
 }
 
-QString KVConfig::fname()
+QString KVConfig2::fname()
 {
     return fname_.c_str();
 }
 
-void KVConfig::setFname(const QString &fname)
+void KVConfig2::setFname(const QString &fname)
 {
     fname_ = fname.toStdString();
     fsession_name_ = fname_ + ".session";
@@ -121,17 +121,17 @@ void KVConfig::setFname(const QString &fname)
     load(fsession_name_.c_str());
 }
 
-QString KVConfig::get(const QString &key)
+QString KVConfig2::get(const QString &key)
 {
     return get_value(key.toStdString().c_str(), "");
 }
 
-void KVConfig::set(const QString &key, const QString &val)
+void KVConfig2::set(const QString &key, const QString &val)
 {
     set_value(key.toStdString().c_str(), val.toStdString().c_str());
 }
 
-void KVConfig::save()
+void KVConfig2::save()
 {
     save_as(fsession_name_.c_str());
 }

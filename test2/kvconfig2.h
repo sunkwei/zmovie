@@ -8,7 +8,7 @@
 #include <QString>
 
 // 加载/保存 key=value 配置文件 ...
-class KVConfig : public QQuickItem
+class KVConfig2 : public QQuickItem
 {
     Q_OBJECT
 
@@ -19,8 +19,8 @@ class KVConfig : public QQuickItem
     KVS kvs_;
 
 public:
-    KVConfig(const char *fname, const char *base_url = 0);
-    KVConfig();
+    KVConfig2(const char *fname, const char *base_url = 0);
+    KVConfig2();
 
     const char *get_value(const char *key, const char *def = 0);
     void set_value(const char *key, const char *value);

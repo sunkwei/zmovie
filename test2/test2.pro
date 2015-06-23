@@ -7,7 +7,7 @@ SOURCES += main.cpp \
     mediathread.cpp \
     ffmpegwrap.cpp \
     test_ffmpeg.cpp \
-    kvconfig.cpp
+    kvconfig2.cpp
 
 RESOURCES += qml.qrc
 
@@ -33,7 +33,7 @@ HEADERS += \
     test_ffmpeg.h \
     utils.h \
     circ_buf.h \
-    kvconfig.h
+    kvconfig2.h
 
 # macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil -lswresample
 

@@ -9,9 +9,9 @@
 #include <assert.h>
 #include "mediathread.h"
 #include "circ_buf.h"
-#include "kvconfig.h"
+#include "kvconfig2.h"
 
-extern KVConfig *_cfg;
+extern KVConfig2 *_cfg;
 
 #define AU_BUFSIZE (64*1024)
 class AudioBuffer : public QIODevice
@@ -128,7 +128,7 @@ private:
 
     double duration_;
 
-    KVConfig *cfg_;
+    KVConfig2 *cfg_;
 };
 
 #endif // MYPLAYER_H
