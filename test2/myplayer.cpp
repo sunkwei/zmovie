@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <QRect>
 #include <QPen>
+#include <sstream>
 
 MyPlayer::MyPlayer()
 {

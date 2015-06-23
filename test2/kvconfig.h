@@ -19,7 +19,7 @@ class KVConfig : public QQuickItem
     KVS kvs_;
 
 public:
-    KVConfig(const char *fname);
+    KVConfig(const char *fname, const char *base_url = 0);
     KVConfig();
 
     const char *get_value(const char *key, const char *def = 0);

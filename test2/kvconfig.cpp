@@ -5,7 +5,7 @@ KVConfig::KVConfig()
 
 }
 
-KVConfig::KVConfig(const char *fname)
+KVConfig::KVConfig(const char *fname, const char *base_url)
 {
     fname_ = fname;
     fsession_name_ = fname_ + ".session";
