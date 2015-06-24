@@ -10,6 +10,7 @@
 #include "mediathread.h"
 #include "circ_buf.h"
 #include "kvconfig2.h"
+#include "detect/DetectLoader.h"
 
 extern KVConfig2 *_cfg;
 
@@ -74,6 +75,7 @@ class MyPlayer : public QQuickPaintedItem
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(bool cl_enabled READ cl_enabled WRITE cl_setEnabled NOTIFY cl_enabledChanged)
     Q_PROPERTY(double cache_duration READ cache_duration WRITE setCache_duration NOTIFY cache_durationChanged)
+    Q_PROPERTY(bool det_enabled READ det_enabled WRITE det_setEnabled NOTIFY det_enabledChanged)
 
 public:
     MyPlayer();
@@ -85,6 +87,9 @@ public:
 
     bool cl_enabled() const { return cl_enabled_; }
     void cl_setEnabled(bool enable) { cl_enabled_ = enable; }
+
+    bool det_enabled() const { return det_enabled_; }
+    void det_setEnabled(bool e);
 
     double cache_duration() const { return duration_; }
     void setCache_duration(double d) { duration_ = d; }
@@ -103,15 +108,19 @@ private slots:
     void when_check_frame();
     void when_cl_enabledChanged();
     void when_cache_durationChanged();
+    void when_det_enabledChanged(bool);
 
 signals:
     void urlChanged();
     void cl_enabledChanged();
     void cache_durationChanged();
+    void det_enabledChanged(bool);
 
 private:
     void check_video_frame(double now);
     void load_calibration_data();
+    void draw_cl_lines(QImage *img);
+    void draw_det_result(const std::vector<QRect> &rcs, QImage *image);
 
 private:
     QString url_, info_;
@@ -127,6 +136,9 @@ private:
     std::deque<QPoint> cl_points_;
 
     double duration_;
+
+    bool det_enabled_;
+    DetectLoader *detect_loader_;
 
     KVConfig2 *cfg_;
 };

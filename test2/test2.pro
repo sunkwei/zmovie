@@ -1,13 +1,19 @@
 TEMPLATE = app
 
-QT += qml quick widgets multimedia
+QT += qml quick widgets multimedia script
+
+DEFINES -= UNICODE
 
 SOURCES += main.cpp \
     myplayer.cpp \
     mediathread.cpp \
     ffmpegwrap.cpp \
     test_ffmpeg.cpp \
-    kvconfig2.cpp
+    kvconfig2.cpp \
+    detect/DetectLoader.cpp \
+    cJSON.c \
+    ptz/ptz0.cpp \
+    ptz.cpp
 
 RESOURCES += qml.qrc
 
@@ -23,7 +29,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2
+win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2 -lws2_32
 
 HEADERS += \
     myplayer.h \
@@ -33,9 +39,9 @@ HEADERS += \
     test_ffmpeg.h \
     utils.h \
     circ_buf.h \
-    kvconfig2.h
-
-# macx: LIBS += -L/opt/local/lib/ -lavcodec -lavformat -lswscale -lavutil -lswresample
-
-#INCLUDEPATH += /opt/local/include
-#DEPENDPATH += /opt/local/include
+    kvconfig2.h \
+    detect/DetectLoader.h \
+    zifimage.h \
+    cJSON.h \
+    ptz/ptz0.h \
+    ptz.h

@@ -11,6 +11,7 @@
 #include <QImage>
 #include "utils.h"
 #include <assert.h>
+#include "kvconfig2.h"
 
 /** 启动工作线程，保存解码帧 ...
  */
@@ -24,6 +25,7 @@ public:
     {
         double stamp_;
         int width_, height_;
+        int input_width_, input_height_;
         AVPicture pic_;
         QImage *image_;
         SwsContext *sws_;
@@ -35,6 +37,10 @@ public:
         void save(const AVFrame *frame, double stamp);
         QImage *image() const;
         double stamp() const;
+
+        int width() const { return width_; }
+        int height() const { return height_; }
+        const AVPicture &pic() const { return pic_; }
     };
 
     class Pcm

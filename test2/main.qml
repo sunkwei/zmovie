@@ -2,7 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
-import zonekey.qd 1.3
+import zonekey.qd 1.4
 import QtQuick.Layouts 1.1
 import QtWebKit 3.0
 
@@ -31,12 +31,17 @@ ApplicationWindow {
         fname: "student_detect_trace.config";
     }
 
+    Ptz {
+        id: ptz
+    }
+
     MainForm {
         id: mf
         anchors.fill: parent
 
         button1.onClicked: {
             player1.url = kvc.get("video_source");
+            player1.det_enabled = true;
             player1.play();
 
             player2.url = kvc.get("video_source_tracing");
@@ -54,7 +59,79 @@ ApplicationWindow {
         }
 
         button_refresh.onClicked: {
-            browser.url = input_url.text
+            browser.url = input_url.text;
+        }
+
+        ptz_down.onPressedChanged: {
+            if (ptz_down.pressed) {
+                ptz.down(1);
+            }
+            else {
+                ptz.stop();
+
+                var pos = ptz.get_pos();
+                info.text = "down stopped: pos=(" + pos.x + ", " + pos.y + ")"
+            }
+        }
+
+        ptz_up.onPressedChanged: {
+            if (ptz_up.pressed) {
+                ptz.up(1);
+            }
+            else {
+                ptz.stop();
+
+                var pos = ptz.get_pos();
+                info.text = "up stopped: pos=(" + pos.x + ", " + pos.y + ")"
+            }
+        }
+
+        ptz_left.onPressedChanged: {
+            if (ptz_left.pressed) {
+                ptz.left(1);
+            }
+            else {
+                ptz.stop();
+
+                var pos = ptz.get_pos();
+                info.text = "left stopped: pos=(" + pos.x + ", " + pos.y + ")"
+            }
+        }
+
+        ptz_right.onPressedChanged: {
+            if (ptz_right.pressed) {
+                ptz.right(1);
+            }
+            else {
+                ptz.stop();
+
+                var pos = ptz.get_pos();
+                info.text = "right stopped: pos=(" + pos.x + ", " + pos.y + ")"
+            }
+        }
+
+        ptz_zoom_tele.onPressedChanged: {
+            if (ptz_zoom_tele.pressed) {
+                ptz.zoom_tele(1);
+            }
+            else {
+                ptz.zoom_stop();
+
+                var zoom = ptz.get_zoom();
+                info.text = "zoom tele: zoom=" + zoom.zoom;
+            }
+        }
+
+        ptz_zoom_wide.onPressedChanged: {
+            if (ptz_zoom_wide.pressed) {
+                ptz.zoom_wide(1);
+            }
+            else {
+                ptz.zoom_stop();
+
+                var zoom = ptz.get_zoom();
+                info.text = "zoom wide: zoom=" + zoom.zoom;
+            }
         }
 
         mouse_area.onReleased: {
@@ -83,6 +160,13 @@ ApplicationWindow {
                 //player1.cl_remove_all_points();
             }
         }
+    }
+
+    Component.onCompleted: {
+        // 此时加载完成???
+        var ptz_url = kvc.get("ptz_serial_name");
+        messageDialog.show("try to open ptz url:" + ptz_url);
+        ptz.url = ptz_url;
     }
 
     MessageDialog {

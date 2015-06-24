@@ -4,6 +4,7 @@
 #include <QRect>
 #include <QPen>
 #include <sstream>
+#include "cJSON.h"
 
 MyPlayer::MyPlayer()
 {
@@ -13,6 +14,7 @@ MyPlayer::MyPlayer()
     timer_.setInterval(10);
     QObject::connect(&timer_, SIGNAL(timeout()), this, SLOT(when_check_frame()));
     QObject::connect(this, SIGNAL(cl_enabledChanged()), this, SLOT(when_cl_enabledChanged()));
+    QObject::connect(this, SIGNAL(det_enabledChanged(bool)), this, SLOT(when_det_enabledChanged(bool)));
 
     th_ = 0;
 
@@ -27,11 +29,13 @@ MyPlayer::MyPlayer()
     audio_output_ = new QAudioOutput(fmt, this);
     ab_ = 0;
     cl_enabled_ = false;
+    det_enabled_ = false;
+    detect_loader_ = 0;
 
     load_calibration_data();
 
     /** 设置默认缓冲时间 .. */
-    duration_ = 0.3;
+    duration_ = 0.0;
 }
 
 MyPlayer::~MyPlayer()
@@ -51,11 +55,16 @@ void MyPlayer::when_cache_durationChanged()
 
 }
 
+void MyPlayer::when_det_enabledChanged(bool e)
+{
+}
+
 void MyPlayer::check_video_frame(double now)
 {
     // 每隔10ms，检查是否有需要 render 的图像 ...
     assert(th_);
 
+#if 0
     if (first_video_) {
         // 等待至少缓冲几帧之后，再开始真正的播放，这样能够更平滑 ...
         if (th_->video_pending_duration() > duration_) {
@@ -88,44 +97,196 @@ void MyPlayer::check_video_frame(double now)
             qDebug("rending op tooo slow !!!");
         }
     }
+#else
+    // FIXME: 立即播放 ...
+    if (th_->video_pending_size() > 0) {
+        if (img_rending_) {
+            qDebug("rending op tooo slow !!!");
+        }
+        else {
+            MediaThread::Picture *p = th_->lock_picture();
+            img_rending_ = p;
+            update();
+        }
+    }
+#endif //
+}
+
+void MyPlayer::draw_cl_lines(QImage *img)
+{
+    QPen pen(QColor(0, 255, 0)), pent(QColor(255, 0, 0));
+    pen.setWidth(3), pent.setWidth(3);
+
+    std::deque<QPoint>::const_iterator it = cl_points_.begin(), it0 = it;
+
+    QPainter painter;
+    QPainter *p = &painter;
+
+    p->begin(img);
+
+    int x0 = it0->x() * img->width() / width(), x = x0;
+    int y0 = it0->y() * img->height() / height(), y = y0;
+
+    p->setPen(pen);
+    p->drawRect(x0-5, y0-5, 10, 10);
+
+    for (++it; it != cl_points_.end(); ++it, ++it0) {
+        int x = it->x() * img->width() / width();
+        int y = it->y() * img->height() / height();
+
+        p->drawLine(QPoint(x0, y0), QPoint(x, y));
+
+        x0 = x, y0 = y;
+    }
+
+    if (x != x0 || y != y0) {
+        p->setPen(pent);
+        p->drawLine(QPoint(x, y), QPoint(x0, y0));
+    }
+
+    p->end();
+}
+
+static zifImage *build_zifImage(MediaThread::Picture *img)
+{
+    // 需要从 rgb32 转换为 bgr24 .
+    zifImage *zimg = (zifImage*)malloc(sizeof(zifImage));
+    zimg->width = img->width();
+    zimg->height = img->height();
+    const AVPicture &pic = img->pic();
+    for (int i = 0; i < 4; i++) {
+        zimg->data[i] = pic.data[i];
+        zimg->stride[i] = pic.linesize[i];
+    }
+
+    return zimg;
+}
+
+static void free_zifImage(zifImage *zimg)
+{
+    free(zimg);
+}
+
+// 探测结果，从 det_detect() 中返回的 json 字符串中解析 ...
+struct DetectResult
+{
+    double stamp;
+    std::vector<QRect> rcs;
+    int flipped_index;
+};
+
+static std::vector<QRect> _parse_rects(cJSON *j)
+{
+    std::vector<QRect> rcs;
+
+    assert(j->type == cJSON_Array);
+    cJSON *c = j->child;
+
+    while (c) {
+        assert(c->type == cJSON_Object);
+        cJSON *r = c->child;
+
+        QRect rc(-1, -1, 0, 0);
+
+        while (r) {
+            if (!strcmp("x", r->string))
+                rc.setX(r->valueint);
+            if (!strcmp("y", r->string))
+                rc.setY(r->valueint);
+            if (!strcmp("width", r->string))
+                rc.setWidth(r->valueint);
+            if (!strcmp("height", r->string))
+                rc.setHeight(r->valueint);
+
+            r = r->next;
+        }
+
+        if (rc.width() * rc.height() > 5) {
+            rcs.push_back(rc);
+        }
+
+        c = c->next;
+    }
+
+    return rcs;
+}
+
+/** { "stamp": 12345,
+ *    "rect": [
+ *       { "x": XX, "y": YY, "width": WWW, "height": HHH},
+ *       { "x": XX, "y": YY, "width": WWW, "height": HHH},
+ *         ....
+ *    ],
+ *    "flipped_idx": INDEX
+ *  }
+ */
+static DetectResult parse_det_result(const char *str)
+{
+    DetectResult dr = { -1 };
+    if (str) {
+        cJSON *j = cJSON_Parse(str);
+        if (j) {
+            assert(j->type == cJSON_Object);
+
+            cJSON *c = j->child;
+            while (c) {
+                if (!strcmp("stamp", c->string)) {
+                    assert(c->type == cJSON_Number);
+                    dr.stamp = c->valuedouble;
+                }
+                if (!strcmp("rect", c->string)) {
+                    assert(c->type == cJSON_Array);
+                    dr.rcs = _parse_rects(c);
+                }
+                if (!strcmp("flipped_index", c->string)) {
+                    assert(c->type == cJSON_Number);
+                    dr.flipped_index = c->valueint;
+                }
+
+                c = c->next;
+            }
+            cJSON_Delete(j);
+        }
+    }
+
+    return dr;
+}
+
+void MyPlayer::draw_det_result(const std::vector<QRect> &rcs, QImage *image)
+{
+    QPainter p;
+    p.begin(image);
+    QPen pen(QColor(255, 0, 0));
+    pen.setWidth(3);
+    p.setPen(pen);
+
+    for (std::vector<QRect>::const_iterator it = rcs.begin(); it != rcs.end(); ++it) {
+        p.drawRect(*it);
+    }
+
+    p.end();
 }
 
 void MyPlayer::paint(QPainter *painter)
 {
     if (img_rending_ && th_) {
         QRectF r(0, 0, width(), height());
+
         QImage *img = img_rending_->image();
 
         // 画标定线 ...
         if (cl_enabled() && !cl_points_.empty()) {
-            QPen pen(QColor(0, 255, 0)), pent(QColor(255, 0, 0));
-            pen.setWidth(3), pent.setWidth(3);
+            draw_cl_lines(img);
+        }
+        else if (det_enabled() && detect_loader_) {
+            zifImage *zimg = build_zifImage(img_rending_);
+            const char *result = detect_loader_->detect(zimg);
+            free_zifImage(zimg);
 
-            QPainter p;
-            p.begin(img);
-            std::deque<QPoint>::const_iterator it = cl_points_.begin(), it0 = it;
-
-            int x0 = it0->x() * img->width() / width(), x = x0;
-            int y0 = it0->y() * img->height() / height(), y = y0;
-
-            p.setPen(pen);
-            p.drawRect(x0-5, y0-5, 10, 10);
-
-            for (++it; it != cl_points_.end(); ++it, ++it0) {
-                int x = it->x() * img->width() / width();
-                int y = it->y() * img->height() / height();
-
-                p.drawLine(QPoint(x0, y0), QPoint(x, y));
-
-                x0 = x, y0 = y;
+            DetectResult dr = parse_det_result(result);
+            if (!dr.rcs.empty()) {
+                draw_det_result(dr.rcs, img);
             }
-
-            if (x != x0 || y != y0) {
-                p.setPen(pent);
-                p.drawLine(QPoint(x, y), QPoint(x0, y0));
-            }
-
-            p.end();
         }
 
         painter->drawImage(r, *img);
@@ -306,5 +467,27 @@ void MyPlayer::cl_save()
 
         cfg_->set_value("calibration_data", cd.c_str());
         cfg_->save_as();
+
+        if (detect_loader_) {
+            detect_loader_->reopen();
+        }
     }
+}
+
+void MyPlayer::det_setEnabled(bool e)
+{
+    if (e) {
+        if (!detect_loader_) {
+            detect_loader_ = new DetectLoader(cfg_->get_value("detect_mod", "det_s.dll.dll"),
+                                              cfg_->fname().toStdString().c_str());
+        }
+    }
+    else {
+        if (detect_loader_) {
+            delete detect_loader_;
+            detect_loader_ = 0;
+        }
+    }
+
+    det_enabled_ = e;
 }

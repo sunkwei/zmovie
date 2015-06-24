@@ -1,7 +1,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
-import zonekey.qd 1.3
+import zonekey.qd 1.4
 import QtWebKit 3.0
 
 Item {
@@ -20,6 +20,14 @@ Item {
     property alias mouse_area: ma
     property alias info: info
     property alias save_calibration: save_calibration
+    property alias ptz_left: button_ptz_left
+    property alias ptz_up: button_ptz_up
+    property alias ptz_right: button_ptz_right
+    property alias ptz_down: button_ptz_down
+    property alias ptz_zoom_tele: button_ptz_zoom_tele
+    property alias ptz_zoom_wide: button_ptz_zoom_wide
+    property alias det_thres_area: sliderHorizontal_thres_area
+    property alias det_thres_dis: sliderHorizontal_thres_dis
 
     RowLayout {
         id: player_layout
@@ -30,6 +38,8 @@ Item {
         Button {
             id: button1
             text: "play"
+            anchors.top: parent.top
+            anchors.topMargin: 126
         }
 
         Button {
@@ -52,6 +62,24 @@ Item {
                 enabled: true
                 anchors.fill: parent
                 hoverEnabled: true
+
+                Button {
+                    id: button_ptz_up
+                    x: 502
+                    y: 95
+                    width: 22
+                    height: 23
+                    text: qsTr("U")
+                }
+
+                Button {
+                    id: button_ptz_zoom_tele
+                    x: 476
+                    y: 198
+                    width: 26
+                    height: 23
+                    text: qsTr("T")
+                }
             }
         }
 
@@ -119,10 +147,70 @@ Item {
 
     Button {
         id: save_calibration
-        x: 158
-        y: 170
+        x: 46
+        y: 171
         text: qsTr("save_cal")
         property int current_state
         current_state: 0
+    }
+
+    Button {
+        id: button_ptz_left
+        x: 664
+        y: 126
+        width: 22
+        height: 23
+        text: qsTr("L")
+    }
+
+    Button {
+        id: button_ptz_right
+        x: 709
+        y: 126
+        width: 20
+        height: 23
+        text: qsTr("R")
+    }
+
+    Button {
+        id: button_ptz_down
+        x: 682
+        y: 155
+        width: 25
+        height: 23
+        text: qsTr("D")
+    }
+
+    Button {
+        id: button_ptz_zoom_wide
+        x: 697
+        y: 200
+        width: 23
+        height: 23
+        text: qsTr("W")
+    }
+
+    Slider {
+        id: sliderHorizontal_thres_dis
+        x: 8
+        y: 201
+        width: 160
+        height: 22
+        stepSize: 2
+        minimumValue: 10
+        value: 20
+        maximumValue: 60
+    }
+
+    Slider {
+        id: sliderHorizontal_thres_area
+        x: 8
+        y: 234
+        width: 160
+        height: 22
+        stepSize: 10
+        minimumValue: 3000
+        value: 5000
+        maximumValue: 8000
     }
 }

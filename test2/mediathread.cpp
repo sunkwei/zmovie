@@ -1,9 +1,12 @@
 #include "mediathread.h"
 
+extern KVConfig2 *_cfg;
+
 MediaThread::MediaThread(const char *url)
     : url_(url)
 {
     quit_ = false;
+
     prepare_cache(30);
     start();
 }
@@ -37,15 +40,19 @@ void MediaThread::run()
 
 MediaThread::Picture::Picture()
 {
-    width_ = height_ = 16;
-    sws_ = sws_getContext(width_, height_, AV_PIX_FMT_YUV420P, width_, height_, AV_PIX_FMT_RGB32, SWS_FAST_BILINEAR, 0, 0, 0);
-    avpicture_alloc(&pic_, AV_PIX_FMT_RGB32, width_, height_);
-    image_ = new QImage(pic_.data[0], width_, height_, pic_.linesize[0], QImage::Format_RGB32);
+    width_ = atoi(_cfg->get_value("video_width", "480"));
+    height_ = atoi(_cfg->get_value("video_height", "270"));
+    sws_ = 0;
+    avpicture_alloc(&pic_, AV_PIX_FMT_RGB24, width_, height_);  // 总是使用 rgb32 ...
+    image_ = new QImage(pic_.data[0], width_, height_, pic_.linesize[0], QImage::Format_RGB888);
+    input_width_ = 0, input_height_ = 0;
 }
 
 MediaThread::Picture::~Picture()
 {
-    sws_freeContext(sws_);
+    if (sws_) {
+        sws_freeContext(sws_);
+    }
     delete image_;
     avpicture_free(&pic_);
 }
@@ -54,17 +61,15 @@ void MediaThread::Picture::save(const AVFrame *frame, double stamp)
 {
     this->stamp_ = stamp;
 
-    if (frame->width != width_ || frame->height != height_) {
-        width_ = frame->width, height_ = frame->height;
+    if (frame->width != input_width_ || frame->height != input_height_) {
+        input_width_ = frame->width, input_height_ = frame->height;
 
-        sws_freeContext(sws_);
-        delete image_;
-        avpicture_free(&pic_);
+        if (sws_) {
+            sws_freeContext(sws_);
+        }
 
-        avpicture_alloc(&pic_, AV_PIX_FMT_RGB32, width_, height_);
-        image_ = new QImage(pic_.data[0], width_, height_, pic_.linesize[0], QImage::Format_RGB32);
         sws_ = sws_getContext(frame->width, frame->height, (PixelFormat)frame->format,
-                             width_, height_, AV_PIX_FMT_RGB32, SWS_FAST_BILINEAR, 0, 0, 0);
+                             width_, height_, AV_PIX_FMT_RGB24, SWS_FAST_BILINEAR, 0, 0, 0);
     }
 
     sws_scale(sws_, frame->data, frame->linesize, 0, frame->height, pic_.data, pic_.linesize);
