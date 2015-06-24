@@ -8,13 +8,22 @@
 #include "../kvconfig2.h"
 #include "ptz0.h"
 #include <stdarg.h>
-#include <process.h>
 #include <math.h>
 #include <assert.h>
 #include "../cJSON.h"
 #include <assert.h>
 #include "../utils.h"
-
+#include <cc++/socket.h>
+#ifdef WIN32
+#   include <process.h>
+#else
+#   include <unistd.h>
+#   include <errno.h>
+#   include <fcntl.h>
+#   define closesocket close
+#   define WSAGetLastError() errno
+#   define WSAEWOULDBLOCK EAGAIN
+#endif //
 namespace {
 	struct Ptz
 	{
@@ -221,6 +230,21 @@ static int connect_t(int sock, const sockaddr *addr, int len, int timeout = 3000
 	}
 }
 
+static bool SetSocketBlockingEnabled(int fd, bool blocking)
+{
+   if (fd < 0) return false;
+
+#ifdef WIN32
+   unsigned long mode = blocking ? 0 : 1;
+   return (ioctlsocket(fd, FIONBIO, &mode) == 0) ? true : false;
+#else
+   int flags = fcntl(fd, F_GETFL, 0);
+   if (flags < 0) return false;
+   flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
+   return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
+#endif
+}
+
 /** 对 url 发出 cmd，接收保存到 res 中.
 
 	 FIXME: 这种接收是有问题的，因为不知道何时接受完成 ...
@@ -236,7 +260,7 @@ static int tcp_req(const char *url, const char *cmd, int cmdlen, char *res, size
 		return -1;
 	}
 
-	ADDRINFO ai, *info, *p;
+    struct addrinfo ai, *info, *p;
 	memset(&ai, 0, sizeof(ai));
 	ai.ai_family = AF_INET;
 	ai.ai_socktype = SOCK_STREAM;
@@ -260,8 +284,7 @@ static int tcp_req(const char *url, const char *cmd, int cmdlen, char *res, size
 			continue;
 		}
 
-		u_long non_block = 1;
-		ioctlsocket(sock, FIONBIO, &non_block);
+        SetSocketBlockingEnabled(sock, false);
 
 		if (connect_t(sock, p->ai_addr, p->ai_addrlen, timeout) < 0) {
 			fprintf(stderr, "[libptz] ERR: can't connect to %s\n", url);

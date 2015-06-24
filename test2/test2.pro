@@ -20,7 +20,7 @@ RESOURCES += qml.qrc
 mac {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
-    PKGCONFIG += libavcodec libavformat libswscale libswresample
+    PKGCONFIG += libavcodec libavformat libswscale libswresample libccgnu2 libccext2
 }
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
@@ -29,7 +29,9 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-win32: LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2 -lws2_32
+win32 {
+    LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2 -lws2_32
+}
 
 HEADERS += \
     myplayer.h \

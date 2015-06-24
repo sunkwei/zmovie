@@ -4,7 +4,7 @@
 #else
 #   define LoadLibrary(fname) dlopen(fname, RTLD_LAZY)
 #   define GetProcAddress(mod, name) dlsym(mod, name)
-#   define CloseHandle(mod) dlcloes(mod)
+#   define FreeLibrary(mod) dlclose(mod)
 #endif
 
 DetectLoader::DetectLoader(const char *dll_fname, const char *cfg_fname)
@@ -13,7 +13,9 @@ DetectLoader::DetectLoader(const char *dll_fname, const char *cfg_fname)
 	cfg_fname_ = cfg_fname;
 	dll_fname_ = dll_fname;
 
+#ifdef WIN32
     SetDllDirectory("./runtime/bin/");
+#endif
 
 	dll_ = LoadLibrary(dll_fname);
 	if (dll_) {
