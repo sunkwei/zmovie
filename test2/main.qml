@@ -55,7 +55,7 @@ ApplicationWindow {
         }
 
         button_home.onClicked: {
-            browser.url = "http://172.16.1.111:8888/config/copy_card0.config/index"
+            browser.url = "http://172.16.1.111:8888/config/student_detect_trace.config/index"
         }
 
         button_refresh.onClicked: {
@@ -158,6 +158,34 @@ ApplicationWindow {
                 save_calibration.current_state = 0;
                 player1.cl_enabled = true;
                 //player1.cl_remove_all_points();
+            }
+        }
+
+        det_factor_00.onValueChanged: {
+            var v = det_factor_00.value;
+            if (player1.det_enabled) {
+                // TODO: notify ..
+            }
+        }
+
+        det_factor_05.onValueChanged: {
+            var v = det_factor_05.value;
+            if (player1.det_enabled) {
+
+            }
+        }
+
+        det_thres_area.onValueChanged: {
+            var v = det_thres_area.value;
+            if (player1.det_enabled) {
+
+            }
+        }
+
+        det_thres_dis.onValueChanged: {
+            var v = det_thres_dis.value;
+            if (player1.det_enabled) {
+
             }
         }
     }

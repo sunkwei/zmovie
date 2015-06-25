@@ -8,14 +8,19 @@ SOURCES += main.cpp \
     myplayer.cpp \
     mediathread.cpp \
     ffmpegwrap.cpp \
-    test_ffmpeg.cpp \
     kvconfig2.cpp \
     detect/DetectLoader.cpp \
     cJSON.c \
     ptz/ptz0.cpp \
     ptz.cpp
 
+lupdate_only {
+    SOURCES += MainForm.ui.qml main.qml
+}
+
 RESOURCES += qml.qrc
+
+TRANSLATIONS = test2-zh_CN.ts test2-en_US.ts
 
 mac {
     QT_CONFIG -= no-pkg-config
@@ -38,7 +43,6 @@ HEADERS += \
     mediathread.h \
     decode_result.h \
     ffmpegwrap.h \
-    test_ffmpeg.h \
     utils.h \
     circ_buf.h \
     kvconfig2.h \
@@ -47,3 +51,5 @@ HEADERS += \
     cJSON.h \
     ptz/ptz0.h \
     ptz.h
+
+DISTFILES +=

@@ -3,14 +3,15 @@ import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 import zonekey.qd 1.4
 import QtWebKit 3.0
+import QtQuick.Controls.Styles 1.3
 
 Item {
     id: item1
     width: 1280
     height: 720
 
-    property alias button2: button2
-    property alias button1: button1
+    property alias button2: button_stop
+    property alias button1: button_player
     property alias player1: player1
     property alias player2: player2
     property alias browser: webView1
@@ -28,28 +29,42 @@ Item {
     property alias ptz_zoom_wide: button_ptz_zoom_wide
     property alias det_thres_area: sliderHorizontal_thres_area
     property alias det_thres_dis: sliderHorizontal_thres_dis
+    property alias det_factor_05: sliderHorizontal_factor_05
+    property alias det_factor_00: sliderHorizontal_factor_00
+    property alias ma_player2: player2_ma
 
     RowLayout {
         id: player_layout
+        y: 0
         anchors.left: parent.left
         anchors.right: parent.right
         height: 275
+        anchors.rightMargin: 0
+        anchors.leftMargin: 0
 
-        Button {
-            id: button1
-            text: "play"
-            anchors.top: parent.top
-            anchors.topMargin: 126
+        // 左侧按钮区 ...
+        ColumnLayout {
+            Button {
+                id: button_player
+                text: qsTr("play")
+            }
+
+            Button {
+                id: button_stop
+                text: qsTr("stop")
+            }
+
+            Button {
+                id: save_calibration
+                text: qsTr("save_cal")
+                property int current_state
+                current_state: 0
+            }
         }
 
-        Button {
-            id: button2
-            text: qsTr("stop")
-        }
-
+        // 探测源视频 ...
         Player {
             id: player1
-            //x: 300
             width: 480
             height: 270
             fillColor: "#ff0000"
@@ -62,27 +77,201 @@ Item {
                 enabled: true
                 anchors.fill: parent
                 hoverEnabled: true
+            }
+        }
 
-                Button {
-                    id: button_ptz_up
-                    x: 502
-                    y: 95
-                    width: 22
-                    height: 23
-                    text: qsTr("U")
+        // 学生标定的 ...
+        ColumnLayout {
+            Label {
+                text: qsTr("thres_dis")
+            }
+
+            Slider {
+                id: sliderHorizontal_thres_dis
+                stepSize: 2
+                minimumValue: 10
+                value: 20
+                maximumValue: 60
+                tickmarksEnabled: true
+                updateValueWhileDragging: true;
+
+                style: SliderStyle {
+                    handle: Rectangle {
+                        height: 15;
+                        width: height*2
+                        radius: width/2
+                        color: "#fff"
+
+                        Text {
+                            anchors.fill: parent
+                            id: value_slider_thres_dis
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignHCenter
+                            text: sliderHorizontal_thres_dis.value
+                        }
+                    }
+
+                    groove: Rectangle {
+                        implicitHeight: 10;
+                        implicitWidth: 100
+                        radius: height/2
+                        border.color: "#333"
+                        color: "#222"
+                        Rectangle {
+                            height: parent.height
+                            width: styleData.handlePosition
+                            implicitHeight: 6
+                            implicitWidth: 100
+                            radius: height/2
+                            color: "#555"
+                        }
+                    }
                 }
+            }
 
-                Button {
-                    id: button_ptz_zoom_tele
-                    x: 476
-                    y: 198
-                    width: 26
-                    height: 23
-                    text: qsTr("T")
+            Label {
+                text: qsTr("thres_area")
+            }
+
+            Slider {
+                id: sliderHorizontal_thres_area
+                stepSize: 100
+                minimumValue: 3000
+                value: 5000
+                maximumValue: 8000
+                tickmarksEnabled: true
+                updateValueWhileDragging: true
+
+                style: SliderStyle {
+                    handle: Rectangle {
+                        height: 15;
+                        width: height*2
+                        radius: width/2
+                        color: "#fff"
+
+                        Text {
+                            anchors.fill: parent
+                            id: value_slider_thres_area
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignHCenter
+                            text: sliderHorizontal_thres_area.value
+                        }
+                    }
+
+                    groove: Rectangle {
+                        implicitHeight: 10;
+                        implicitWidth: 100
+                        radius: height/2
+                        border.color: "#333"
+                        color: "#222"
+                        Rectangle {
+                            height: parent.height
+                            width: styleData.handlePosition
+                            implicitHeight: 6
+                            implicitWidth: 100
+                            radius: height/2
+                            color: "#555"
+                        }
+                    }
+                }
+            }
+
+            // 中间系数 ..
+            Label {
+                text: "factor_05";
+            }
+
+            Slider {
+                id: sliderHorizontal_factor_05
+                stepSize: 0.02
+                minimumValue: 0.2
+                value: 0.35
+                maximumValue: 0.6
+                tickmarksEnabled: true
+                updateValueWhileDragging: true;
+
+                style: SliderStyle {
+                    handle: Rectangle {
+                        height: 15;
+                        width: height*2
+                        radius: width/2
+                        color: "#fff"
+
+                        Text {
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignHCenter
+                            text: sliderHorizontal_factor_05.value
+                        }
+                    }
+
+                    groove: Rectangle {
+                        implicitHeight: 10;
+                        implicitWidth: 100
+                        radius: height/2
+                        border.color: "#333"
+                        color: "#222"
+                        Rectangle {
+                            height: parent.height
+                            width: styleData.handlePosition
+                            implicitHeight: 6
+                            implicitWidth: 100
+                            radius: height/2
+                            color: "#555"
+                        }
+                    }
+                }
+            }
+
+            // 后排系数 ...
+            Label {
+                text: qsTr("factor_00");
+            }
+
+            Slider {
+                id: sliderHorizontal_factor_00
+                stepSize: 0.02
+                minimumValue: 0.02
+                value: 0.10
+                maximumValue: 0.40
+                tickmarksEnabled: true
+                updateValueWhileDragging: true;
+
+                style: SliderStyle {
+                    handle: Rectangle {
+                        height: 15;
+                        width: height*2
+                        radius: width/2
+                        color: "#fff"
+
+                        Text {
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignHCenter
+                            text: sliderHorizontal_factor_00.value
+                        }
+                    }
+
+                    groove: Rectangle {
+                        implicitHeight: 10;
+                        implicitWidth: 100
+                        radius: height/2
+                        border.color: "#333"
+                        color: "#222"
+                        Rectangle {
+                            height: parent.height
+                            width: styleData.handlePosition
+                            implicitHeight: 6
+                            implicitWidth: 100
+                            radius: height/2
+                            color: "#555"
+                        }
+                    }
                 }
             }
         }
 
+        // 跟踪源视频 ...
         Player {
             id: player2
             width: 480
@@ -90,6 +279,45 @@ Item {
             fillColor: "#ffff00"
             url: "rtsp://172.16.1.52/av0_0"
             cl_enabled: false
+
+            MouseArea {
+                id: player2_ma;
+                anchors.fill: parent;
+                hoverEnabled: true;
+            }
+        }
+
+        // 云台控制部分...，从上到下分别为 up, left, right, down, tele, wide
+        ColumnLayout {
+            Button {
+                id: button_ptz_up
+                text: qsTr("up")
+            }
+
+            Button {
+                id: button_ptz_left
+                text: qsTr("left")
+            }
+
+            Button {
+                id: button_ptz_right
+                text: qsTr("right")
+            }
+
+            Button {
+                id: button_ptz_down
+                text: qsTr("down")
+            }
+
+            Button {
+                id: button_ptz_zoom_tele
+                text: qsTr("tele")
+            }
+
+            Button {
+                id: button_ptz_zoom_wide
+                text: qsTr("wide")
+            }
         }
     }
 
@@ -143,74 +371,5 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-    }
-
-    Button {
-        id: save_calibration
-        x: 46
-        y: 171
-        text: qsTr("save_cal")
-        property int current_state
-        current_state: 0
-    }
-
-    Button {
-        id: button_ptz_left
-        x: 664
-        y: 126
-        width: 22
-        height: 23
-        text: qsTr("L")
-    }
-
-    Button {
-        id: button_ptz_right
-        x: 709
-        y: 126
-        width: 20
-        height: 23
-        text: qsTr("R")
-    }
-
-    Button {
-        id: button_ptz_down
-        x: 682
-        y: 155
-        width: 25
-        height: 23
-        text: qsTr("D")
-    }
-
-    Button {
-        id: button_ptz_zoom_wide
-        x: 697
-        y: 200
-        width: 23
-        height: 23
-        text: qsTr("W")
-    }
-
-    Slider {
-        id: sliderHorizontal_thres_dis
-        x: 8
-        y: 201
-        width: 160
-        height: 22
-        stepSize: 2
-        minimumValue: 10
-        value: 20
-        maximumValue: 60
-    }
-
-    Slider {
-        id: sliderHorizontal_thres_area
-        x: 8
-        y: 234
-        width: 160
-        height: 22
-        stepSize: 10
-        minimumValue: 3000
-        value: 5000
-        maximumValue: 8000
     }
 }
