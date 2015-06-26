@@ -2,5 +2,8 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
+        <file>MyLogin.qml</file>
+        <file>MyMain.qml</file>
+        <file>MyPlayers.qml</file>
     </qresource>
 </RCC>

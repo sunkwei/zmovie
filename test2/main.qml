@@ -35,9 +35,15 @@ ApplicationWindow {
         id: ptz
     }
 
+    MyLogin {
+        id: login
+        visible: true
+    }
+
     MainForm {
         id: mf
         anchors.fill: parent
+        visible: false
 
         button1.onClicked: {
             player1.url = kvc.get("video_source");

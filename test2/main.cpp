@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<KVConfig2>("zonekey.qd", 1, 4, "KVConfig");
     qmlRegisterType<Ptz>("zonekey.qd", 1, 4, "Ptz");
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    //engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/MyMain.qml")));
 
     return app.exec();
 }

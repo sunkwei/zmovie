@@ -52,4 +52,7 @@ HEADERS += \
     ptz/ptz0.h \
     ptz.h
 
-DISTFILES +=
+DISTFILES += \
+    MyLogin.qml \
+    MyMain.qml \
+    MyPlayers.qml
