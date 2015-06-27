@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
+import QtQuick.Controls 1.2
+import zonekey.qd 1.4
 
 /** 显示登录界面:
         1. 输入目标主机的ip
@@ -14,6 +16,7 @@ Item {
     property alias ip: target_ip
     property alias mode: mode
     signal myOk()
+    property KVConfig kvconfig
 
     // 搞个特效 ..
     PropertyAnimation {

@@ -55,4 +55,6 @@ HEADERS += \
 DISTFILES += \
     MyLogin.qml \
     MyMain.qml \
-    MyPlayers.qml
+    MyPlayers.qml \
+    MyPtzControls.qml \
+    test.config

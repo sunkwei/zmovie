@@ -5,5 +5,7 @@
         <file>MyLogin.qml</file>
         <file>MyMain.qml</file>
         <file>MyPlayers.qml</file>
+        <file>MyPtzControls.qml</file>
+        <file>MyMainPage.qml</file>
     </qresource>
 </RCC>

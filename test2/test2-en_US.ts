@@ -4,72 +4,72 @@
 <context>
     <name>MainForm.ui</name>
     <message>
-        <location filename="MainForm.ui.qml" line="47"/>
+        <location filename="MainForm.ui.qml" line="49"/>
         <source>play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="52"/>
+        <location filename="MainForm.ui.qml" line="54"/>
         <source>stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="57"/>
+        <location filename="MainForm.ui.qml" line="59"/>
         <source>save_cal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="84"/>
+        <location filename="MainForm.ui.qml" line="86"/>
         <source>thres_dis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="131"/>
+        <location filename="MainForm.ui.qml" line="133"/>
         <source>thres_area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="226"/>
+        <location filename="MainForm.ui.qml" line="228"/>
         <source>factor_00</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="292"/>
+        <location filename="MainForm.ui.qml" line="294"/>
         <source>up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="297"/>
+        <location filename="MainForm.ui.qml" line="299"/>
         <source>left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="302"/>
+        <location filename="MainForm.ui.qml" line="304"/>
         <source>right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="307"/>
+        <location filename="MainForm.ui.qml" line="309"/>
         <source>down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="312"/>
+        <location filename="MainForm.ui.qml" line="314"/>
         <source>tele</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="317"/>
+        <location filename="MainForm.ui.qml" line="319"/>
         <source>wide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="356"/>
+        <location filename="MainForm.ui.qml" line="358"/>
         <source>refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="361"/>
+        <location filename="MainForm.ui.qml" line="363"/>
         <source>home</source>
         <translation type="unfinished"></translation>
     </message>
@@ -112,7 +112,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.qml" line="174"/>
+        <location filename="main.qml" line="202"/>
         <source>May I have your attention, please?</source>
         <translation type="unfinished"></translation>
     </message>

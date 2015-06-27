@@ -5,16 +5,15 @@ import zonekey.qd 1.4
 
 /** 保存两个 player，左侧为探测源，右侧为跟踪源视频 ... */
 Item {
-    anchors.fill: parent;
+    height: 300; // 强制高度
 
-    Text {
-        text: "playing ...."
-    }
+    property KVConfig kvconfig;
 
-    ColumnLayout {
+    RowLayout {
         spacing: 30
+        anchors.fill: parents;
 
-        Row {
+        ColumnLayout {
             Text {
                 text: "detecting source ...";
                 height: 25
@@ -30,7 +29,7 @@ Item {
             }
         }
 
-        Row {
+        ColumnLayout {
             Text {
                 text: "tracing source ...";
                 height: 25;
@@ -44,6 +43,11 @@ Item {
                 cl_enabled: false;
                 fillColor: "#ffff00"
             }
+        }
+
+        MyPtzControls {
+            id: ptz_controls;
+            anchors.right: parent.right
         }
     }
 }

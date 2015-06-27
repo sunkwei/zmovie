@@ -4,73 +4,73 @@
 <context>
     <name>MainForm.ui</name>
     <message>
-        <location filename="MainForm.ui.qml" line="47"/>
+        <location filename="MainForm.ui.qml" line="49"/>
         <source>play</source>
         <translatorcomment>播放视频</translatorcomment>
         <translation>播放</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="52"/>
+        <location filename="MainForm.ui.qml" line="54"/>
         <source>stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="57"/>
+        <location filename="MainForm.ui.qml" line="59"/>
         <source>save_cal</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="84"/>
+        <location filename="MainForm.ui.qml" line="86"/>
         <source>thres_dis</source>
         <translation>距离阈值</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="131"/>
+        <location filename="MainForm.ui.qml" line="133"/>
         <source>thres_area</source>
         <translation>面积阈值</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="226"/>
+        <location filename="MainForm.ui.qml" line="228"/>
         <source>factor_00</source>
         <translation>后排系数</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="292"/>
+        <location filename="MainForm.ui.qml" line="294"/>
         <source>up</source>
         <translation>上</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="297"/>
+        <location filename="MainForm.ui.qml" line="299"/>
         <source>left</source>
         <translation>左</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="302"/>
+        <location filename="MainForm.ui.qml" line="304"/>
         <source>right</source>
         <translation>右</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="307"/>
+        <location filename="MainForm.ui.qml" line="309"/>
         <source>down</source>
         <translation>下</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="312"/>
+        <location filename="MainForm.ui.qml" line="314"/>
         <source>tele</source>
         <translation>拉近</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="317"/>
+        <location filename="MainForm.ui.qml" line="319"/>
         <source>wide</source>
         <translation>推远</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="356"/>
+        <location filename="MainForm.ui.qml" line="358"/>
         <source>refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="MainForm.ui.qml" line="361"/>
+        <location filename="MainForm.ui.qml" line="363"/>
         <source>home</source>
         <translation type="unfinished"></translation>
     </message>
@@ -113,7 +113,7 @@
         <translation>保存标定</translation>
     </message>
     <message>
-        <location filename="main.qml" line="174"/>
+        <location filename="main.qml" line="202"/>
         <source>May I have your attention, please?</source>
         <translation type="unfinished"></translation>
     </message>
