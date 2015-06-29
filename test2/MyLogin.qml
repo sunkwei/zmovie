@@ -13,10 +13,9 @@ Item {
     id: login_wnd0
     anchors.fill: parent
 
-    property alias ip: target_ip
-    property alias mode: mode
+    property string ip
+    property string who
     signal myOk()
-    property KVConfig kvconfig
 
     // 搞个特效 ..
     PropertyAnimation {
@@ -83,7 +82,13 @@ Item {
             Row {
                 Button {
                     text: "ok";
-                    onClicked: myOk();
+                    onClicked: {
+                        var who_name = ["teacher", "student", "bd"];
+                        who = who_name[mode.currentIndex];
+                        ip = target_ip.text;
+
+                        myOk();
+                    }
                 }
             }
         }

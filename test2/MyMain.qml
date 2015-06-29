@@ -13,17 +13,20 @@ ApplicationWindow {
 
     KVConfig {
         id: kvc;
-        fname: "test.config"
     }
 
     MyLogin {
         id: login;
         visible: false;
         anchors.centerIn: parent;
-        kvconfig: kvc
         onMyOk: {
             login.visible = false;
             main_page.visible = true;
+
+            var target_ip = login.ip;
+            var who = login.who;
+
+            kvc.fname = who + "_detect_trace.config";
         }
     }
 
