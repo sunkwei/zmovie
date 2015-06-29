@@ -11,6 +11,8 @@ ApplicationWindow {
     height: 720
     visible: true
 
+    property string remote_url;
+
     KVConfig {
         id: kvc;
     }
@@ -25,8 +27,10 @@ ApplicationWindow {
 
             var target_ip = login.ip;
             var who = login.who;
+            var fname = who + "_detect_trace.config";
 
-            kvc.fname = who + "_detect_trace.config";
+            kvc.fname = fname;
+            remote_url = "http://" + target_ip + ":8888/config/" + fname + "/index";
         }
     }
 
@@ -34,6 +38,7 @@ ApplicationWindow {
         id: main_page;
         anchors.fill: parent;
         kvconfig: kvc
+        remote_config_url: remote_url
     }
 
     // 此时加载完成???

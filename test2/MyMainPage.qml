@@ -11,16 +11,8 @@ ColumnLayout {
     spacing: 2;
     anchors.fill: parent
     property KVConfig kvconfig
-
-    // 搞个特效 ..
-    PropertyAnimation {
-        target: main_page
-        property: "opacity";
-        duration: 1000;
-        from: 0; to: 1;
-        easing.type: Easing.InOutQuad ;
-        running: true
-    }
+    property string who;    // 对应着被标定者，目前为 teacher, student, bd
+    property string remote_config_url;  // 目标 url
 
     MyPlayers {
         id: players;
@@ -38,7 +30,7 @@ ColumnLayout {
         WebView {
             id: browser;
             anchors.fill: parent;
-            url: kvconfig.get("url");
+            url: remote_config_url;
         }
     }
 }

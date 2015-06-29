@@ -54,14 +54,23 @@ Item {
                     text: qsTr("input target ip");
                 }
 
-                TextInput {
-                    id: target_ip
-                    width: 200
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: 12
-                    text: "127.0.0.1"
-                    color: "#ffffff"
+                Item {
+                    property alias text: input.text
+                    anchors.centerIn: parent
+                    width: 180; height: 28
+                    BorderImage {
+                         source: "image/lineedit.sci"
+                         anchors.fill: parent
+                    }
+                    TextInput {
+                        id: target_ip
+                        width: 200
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        font.pointSize: 12
+                        text: "127.0.0.1"
+                        color: "#ffffff"
+                    }
                 }
             }
 
