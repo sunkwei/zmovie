@@ -7,5 +7,8 @@
         <file>MyPlayers.qml</file>
         <file>MyPtzControls.qml</file>
         <file>MyMainPage.qml</file>
+        <file>MyTeacherConfig.qml</file>
+        <file>MyKVPair.qml</file>
+        <file>MyTest.qml</file>
     </qresource>
 </RCC>

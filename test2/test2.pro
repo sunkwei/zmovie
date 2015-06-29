@@ -57,4 +57,6 @@ DISTFILES += \
     MyMain.qml \
     MyPlayers.qml \
     MyPtzControls.qml \
-    test.config
+    test.config \
+    MyKVPair.qml \
+    MyTest.qml
