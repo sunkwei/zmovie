@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>MainForm.ui.qml</file>
         <file>MyLogin.qml</file>
         <file>MyMain.qml</file>
         <file>MyPlayers.qml</file>
@@ -10,5 +8,14 @@
         <file>MyTeacherConfig.qml</file>
         <file>MyKVPair.qml</file>
         <file>MyTest.qml</file>
+        <file>MyStudentConfig.qml</file>
+        <file>images/button_default.png</file>
+        <file>images/button_pressed.png</file>
+        <file>images/navigation_next_item.png</file>
+        <file>images/navigation_previous_item.png</file>
+        <file>images/tab_selected.png</file>
+        <file>images/tabs_standard.png</file>
+        <file>images/textinput.png</file>
+        <file>images/toolbar.png</file>
     </qresource>
 </RCC>

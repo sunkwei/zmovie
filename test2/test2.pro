@@ -15,7 +15,7 @@ SOURCES += main.cpp \
     ptz.cpp
 
 lupdate_only {
-    SOURCES += MainForm.ui.qml main.qml
+    SOURCES += MainForm.ui.qml
 }
 
 RESOURCES += qml.qrc
@@ -35,7 +35,8 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 win32 {
-    LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2 -lws2_32
+    LIBS += -lavcodec -lavformat -lavutil -lswscale -lswresample -lccgnu2 -lws2_32 libcurldll.a
+    QMAKE_LFLAGS += /OPT:NOREF
 }
 
 HEADERS += \
@@ -59,4 +60,5 @@ DISTFILES += \
     MyPtzControls.qml \
     test.config \
     MyKVPair.qml \
-    MyTest.qml
+    MyTest.qml \
+    MyStudentConfig.qml

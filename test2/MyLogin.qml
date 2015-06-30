@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
-import QtQuick.Controls 1.2
+import QtQuick.Controls.Styles 1.2
 import zonekey.qd 1.4
 
 /** 显示登录界面:
@@ -17,30 +17,30 @@ Item {
     property string who
     signal myOk()
 
-    // 搞个特效 ..
-    PropertyAnimation {
-        target: login_wnd
-        property: "opacity";
-        duration: 1000;
-        from: 0; to: 1;
-        easing.type: Easing.InOutQuad ;
+    property real progress: 0
+    SequentialAnimation on progress {
+        loops: Animation.Infinite
         running: true
-    }
-
-    // 背景 ..
-    Rectangle {
-        color: "#000000"
-        opacity: 0.6
+        NumberAnimation {
+            from: 0
+            to: 1
+            duration: 3000
+        }
+        NumberAnimation {
+            from: 1
+            to: 0
+            duration: 3000
+        }
     }
 
     // pop upd
-    Rectangle {
+    BorderImage {
         id: login_wnd
-        width: 400
+        width: 450
         height: 300
-        color: "#f56767"
         anchors.centerIn: parent
-        radius: 10
+        border.bottom: 8
+        source: "images/toolbar.png"
 
         // 三层..
         ColumnLayout {
@@ -48,55 +48,105 @@ Item {
             spacing: 20
 
             Row {
-                spacing: 18
+                Layout.alignment: Qt.AlignHCenter;
 
                 Label {
                     text: qsTr("input target ip");
+                    font.pixelSize: 21
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: "white";
                 }
 
-                Item {
-                    property alias text: input.text
-                    anchors.centerIn: parent
-                    width: 180; height: 28
-                    BorderImage {
-                         source: "image/lineedit.sci"
-                         anchors.fill: parent
-                    }
-                    TextInput {
-                        id: target_ip
-                        width: 200
-                        font.bold: true
-                        horizontalAlignment: Text.AlignHCenter
-                        font.pointSize: 12
-                        text: "127.0.0.1"
-                        color: "#ffffff"
+                TextField {
+                    id: target_ip
+                    width: 240
+                    style: touchStyle_txt;
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: 19
+                    text: "172.16.1.111"
+                }
+            }
+
+            Button {
+                text: "teacher";
+                style: touchStyle;
+                Layout.alignment: Qt.AlignHCenter;
+
+                onClicked: {
+                    who = "teacher";
+                    ip = target_ip.text;
+                    myOk();
+                }
+            }
+
+            Button {
+                text: "student";
+                style: touchStyle;
+                Layout.alignment: Qt.AlignHCenter;
+
+                onClicked: {
+                    who = "student";
+                    ip = target_ip.text;
+                    myOk();
+                }
+            }
+
+            Button {
+                text: "bd";
+                style: touchStyle;
+                Layout.alignment: Qt.AlignHCenter;
+
+                onClicked: {
+                    who = "bd";
+                    ip = target_ip.text;
+                    myOk();
+                }
+            }
+
+            Component {
+                id: touchStyle
+                ButtonStyle {
+                    panel: Item {
+                        implicitHeight: 50
+                        implicitWidth: 320
+                        BorderImage {
+                            anchors.fill: parent
+                            antialiasing: true
+                            border.bottom: 8
+                            border.top: 8
+                            border.left: 8
+                            border.right: 8
+                            anchors.margins: control.pressed ? -4 : 0
+                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
+                            Text {
+                                text: control.text
+                                anchors.centerIn: parent
+                                color: "white"
+                                font.pixelSize: 23
+                                renderType: Text.NativeRendering
+                            }
+                        }
                     }
                 }
             }
 
-            Row {
-                spacing: 18
+            Component {
+                id: touchStyle_txt
 
-                Label {
-                    text: qsTr("choose mode");
-                }
-
-                ComboBox {
-                    id: mode
-                    width: 150
-                    model: [qsTr("teacher"), qsTr("student"), qsTr("bd")];
-                }
-            }
-
-            Row {
-                Button {
-                    text: "ok";
-                    onClicked: {
-                        var who_name = ["teacher", "student", "bd"];
-                        who = who_name[mode.currentIndex];
-                        ip = target_ip.text;
-
-                        myOk();
+                TextFieldStyle {
+                    textColor: "white";
+                    background: Item {
+                        implicitHeight: 50
+                        implicitWidth: 320
+                        BorderImage {
+                            source: "../images/textinput.png"
+                            border.left: 8
+                            border.right: 8
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                        }
                     }
                 }
             }

@@ -21,8 +21,6 @@ int main(int argc, char *argv[])
         app.installTranslator(&trans);
     }
 
-    _cfg = new KVConfig2("student_detect_trace.config");
-
     qmlRegisterType<MyPlayer>("zonekey.qd", 1, 4, "Player");
     qmlRegisterType<KVConfig2>("zonekey.qd", 1, 4, "KVConfig");
     qmlRegisterType<Ptz>("zonekey.qd", 1, 4, "Ptz");

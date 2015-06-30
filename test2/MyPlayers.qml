@@ -7,41 +7,29 @@ import zonekey.qd 1.4
 Item {
     height: 300; // 强制高度
 
-    property KVConfig kvconfig;
-
     RowLayout {
         spacing: 30
-        anchors.fill: parents;
+        anchors.fill: parent;
 
         ColumnLayout {
-            Text {
-                text: "detecting source ...";
-                height: 25
-            }
-
             Player {
                 id: player_detector;
                 width: 480;
                 height: 270;
                 det_enabled: false;
                 cl_enabled: false;
-                fillColor: "#ff0000"
+                fillColor: "#ffffff"
             }
         }
 
         ColumnLayout {
-            Text {
-                text: "tracing source ...";
-                height: 25;
-            }
-
             Player {
                 id: player_tracing;
                 width: 480;
                 height: 270;
                 det_enabled: false;
                 cl_enabled: false;
-                fillColor: "#ffff00"
+                fillColor: "#ffffff"
             }
         }
 
@@ -49,5 +37,19 @@ Item {
             id: ptz_controls;
             anchors.right: parent.right
         }
+    }
+
+    Component.onCompleted: {
+        if (!kvc) {
+            console.error("kvc is NULL????");
+        }
+
+        player_detector.url = kvc.get("video_source");
+        console.log("video_source url:" + player_detector.url);
+        player_detector.play();
+
+        player_tracing.url = kvc.get("video_source_tracing");
+        console.log("tracing url:" + player_tracing.url);
+        player_tracing.play();
     }
 }
