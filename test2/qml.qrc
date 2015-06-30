@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>MyLogin.qml</file>
         <file>MyMain.qml</file>
-        <file>MyPlayers.qml</file>
+        <file>MyPlayersTeacher.qml</file>
         <file>MyPtzControls.qml</file>
         <file>MyMainPage.qml</file>
         <file>MyTeacherConfig.qml</file>
@@ -17,5 +17,6 @@
         <file>images/tabs_standard.png</file>
         <file>images/textinput.png</file>
         <file>images/toolbar.png</file>
+        <file>MyPlayersStudent.qml</file>
     </qresource>
 </RCC>

@@ -12,11 +12,23 @@ ColumnLayout {
     property KVConfig kvc  // 全局配置 ..
     property string who;    // 对应着被标定者，目前为 teacher, student, bd
 
-    MyPlayers {
+    Loader {
         id: players;
         Layout.alignment: Qt.AlignCenter
         Layout.fillWidth: true;
-        Layout.preferredHeight: 300
+        Layout.preferredHeight: 350;
+    }
+
+    Component.onCompleted: {
+        if (who == "teacher") {
+            players.setSource("MyPlayersTeacher.qml");
+        }
+        else if (who == "student") {
+            players.setSource("MyPlayersStudent.qml");
+        }
+        else if (who == "bd") {
+            players.setSource("MyPlayersBD.qml");
+        }
     }
 
     Item {
