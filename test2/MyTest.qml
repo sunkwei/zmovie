@@ -1,17 +1,45 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.1
 
 Rectangle {
     width: 600
     height: 400
 
-    property string json_str_config
 
-    MyTeacherConfig {
-        json_of_config: JSON.parse(json_str_config);
+    ScrollView {
         anchors.fill: parent;
-    }
 
-    Component.onCompleted: {
-        json_str_config = "{\"ptz_serial_name\": \"http://...\", \"ptz_addr\": 1 }";
+        ColumnLayout {
+            height: 900
+            width: 600;
+            id: m0
+
+            Button {
+                width: 100;
+                height: 300;
+                Layout.fillWidth: true;
+                text: "button 1";
+                id: b1;
+            }
+
+            Button {
+                id: b2;
+                height: 300;
+                Layout.fillWidth: true;
+                text: "button 2";
+            }
+
+            Button {
+                id: b3;
+                height: 300;
+                Layout.fillWidth: true;
+                text: "button 3";
+            }
+
+            Component.onCompleted: {
+                console.log("m0:" + m0.width + "," + m0.height);
+            }
+        }
     }
 }

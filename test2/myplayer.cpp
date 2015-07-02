@@ -4,6 +4,7 @@
 #include <QRect>
 #include <QPen>
 #include <sstream>
+#include <QtScript/QScriptEngine>
 #include "cJSON.h"
 
 MyPlayer::MyPlayer()
@@ -124,8 +125,13 @@ void MyPlayer::draw_cl_lines(QImage *img)
 
     p->begin(img);
 
+    int l = img->width(), r = 0;    // 左右边沿 ..
+
     int x0 = it0->x() * img->width() / width(), x = x0;
     int y0 = it0->y() * img->height() / height(), y = y0;
+
+    l = x0 < l ? x0 : l;
+    r = x0 > r ? x0 : r;
 
     p->setPen(pen);
     p->drawRect(x0-5, y0-5, 10, 10);
@@ -133,6 +139,9 @@ void MyPlayer::draw_cl_lines(QImage *img)
     for (++it; it != cl_points_.end(); ++it, ++it0) {
         int x = it->x() * img->width() / width();
         int y = it->y() * img->height() / height();
+
+        l = x < l ? x : l;
+        r = x > r ? x : r;
 
         p->drawLine(QPoint(x0, y0), QPoint(x, y));
 
@@ -142,6 +151,13 @@ void MyPlayer::draw_cl_lines(QImage *img)
     if (x != x0 || y != y0) {
         p->setPen(pent);
         p->drawLine(QPoint(x, y), QPoint(x0, y0));
+    }
+
+    // 画left, right线 ..
+    if (cl_points_.size() >= 2) {
+        p->setPen(QPen(QColor(255, 255, 0)));
+        p->drawLine(QPoint(l, 0), QPoint(l, img->height()));
+        p->drawLine(QPoint(r, 0), QPoint(r, img->height()));
     }
 
     p->end();
@@ -267,6 +283,51 @@ void MyPlayer::draw_det_result(const std::vector<QRect> &rcs, QImage *image)
     p.end();
 }
 
+void MyPlayer::draw_dr_one(QPainter &p, const QVariantMap &oper)
+{
+    QVariantMap::const_iterator itf = oper.find("name");
+    if (itf == oper.end()) {
+        return;
+    }
+
+    QString cmd = itf.value().toString();
+
+    if (cmd == "line") {
+        // 画线, x0,y0,  x1,y1
+        if (oper.find("x0") != oper.end() && oper.find("y0") != oper.end() &&
+            oper.find("y0") != oper.end() && oper.find("y1") != oper.end()) {
+            int x0 = oper["x0"].toInt();
+            int y0 = oper["y0"].toInt();
+            int x1 = oper["x1"].toInt();
+            int y1 = oper["y1"].toInt();
+
+            QPen pen(QColor(255, 0, 0));
+            p.setPen(pen);
+
+            p.drawLine(QPoint(x0, y0), QPoint(x1, y1));
+        }
+    }
+    else {
+        // 未支持 ..
+        fprintf(stderr, "MyPlayer::draw_dr_one: notimpl cmd=%s\n", cmd.toStdString().c_str());
+    }
+}
+
+void MyPlayer::draw_dr_history(QImage *image)
+{
+    if (!dr_opers.empty()) {
+        QPainter p;
+        p.begin(image);
+
+        QStack<QVariantMap>::const_iterator it;
+        for (it = dr_opers.begin(); it != dr_opers.end(); ++it) {
+            draw_dr_one(p, *it);
+        }
+
+        p.end();
+    }
+}
+
 void MyPlayer::paint(QPainter *painter)
 {
     if (img_rending_ && th_) {
@@ -288,6 +349,8 @@ void MyPlayer::paint(QPainter *painter)
                 draw_det_result(dr.rcs, img);
             }
         }
+
+        draw_dr_history(img);   // 画可能的 ...
 
         painter->drawImage(r, *img);
         th_->unlock_picture(img_rending_);
@@ -453,19 +516,23 @@ void MyPlayer::cl_remove_all_points()
     cl_points_.clear();
 }
 
+QString MyPlayer::cl_points_desc()
+{
+    std::stringstream ss;
+    for (size_t i = 0; i < cl_points_.size(); i++) {
+        int x = cl_points_[i].x() * atoi(cfg_->get_value("video_width", "480")) / width();
+        int y = cl_points_[i].y() * atoi(cfg_->get_value("video_height", "270")) / height();
+        ss << x << ',' << y << ';';
+    }
+
+    return ss.str().c_str();
+}
+
 void MyPlayer::cl_save()
 {
     if (cl_enabled()) {
-        std::stringstream ss;
-        for (int i = 0; i < cl_points_.size(); i++) {
-            int x = cl_points_[i].x() * atoi(cfg_->get_value("video_width", "480")) / width();
-            int y = cl_points_[i].y() * atoi(cfg_->get_value("video_height", "270")) / height();
-            ss << x << ',' << y << ';';
-        }
-
-        std::string cd = ss.str();
-
-        cfg_->set_value("calibration_data", cd.c_str());
+        QString s = cl_points_desc();
+        cfg_->set_value("calibration_data", s.toStdString().c_str());
         cfg_->save_as();
 
         if (detect_loader_) {
@@ -490,4 +557,28 @@ void MyPlayer::det_setEnabled(bool e)
     }
 
     det_enabled_ = e;
+}
+
+void MyPlayer::det_set_params(double thres_dis, double thres_area, double factor_0, double factor_05)
+{
+    if (det_enabled_ && detect_loader_) {
+        detect_loader_->set_param(thres_dis, thres_area, factor_0, factor_05, 0.0);
+    }
+}
+
+void MyPlayer::dr_push(const QVariantMap &draw_desc)
+{
+    dr_opers.push(draw_desc);
+}
+
+void MyPlayer::dr_pop()
+{
+    if (!dr_opers.empty()) {
+        dr_opers.pop();
+    }
+}
+
+void MyPlayer::dr_clear()
+{
+    dr_opers.clear();
 }

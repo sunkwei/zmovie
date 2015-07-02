@@ -15,6 +15,8 @@ ApplicationWindow {
         id: kvc;
     }
 
+    property alias infos: infos;
+
     toolBar: BorderImage {
         border.bottom: 8
         source: "images/toolbar.png"
@@ -96,9 +98,11 @@ ApplicationWindow {
         }
     }
 
+    // 主窗口 ..
     StackView {
         id: stackView;
         anchors.fill: parent;
+
         delegate: StackViewDelegate {
             function transitionFinished(properties)
             {

@@ -11,6 +11,7 @@
 #include "circ_buf.h"
 #include "kvconfig2.h"
 #include "detect/DetectLoader.h"
+#include <QStack>
 
 extern KVConfig2 *_cfg;
 
@@ -102,7 +103,19 @@ public:
     Q_INVOKABLE void cl_pop_point();
     Q_INVOKABLE void cl_remove_all_points();
     Q_INVOKABLE int cl_points();
+    Q_INVOKABLE QString cl_points_desc(); // 返回需要保存的格式 ...
     Q_INVOKABLE void cl_save();
+
+    Q_INVOKABLE void det_set_params(double thres_dis, double thres_area, double factor_0, double factor_05);
+
+    /*  新增对象，至少包含:
+     *      type: ["line", "circle" ]
+     *
+     *  TODO: 应该增加颜色，模板 ....
+    */
+    Q_INVOKABLE void dr_push(const QVariantMap &draw_desc); // 新增一个画图对象 ..
+    Q_INVOKABLE void dr_pop();
+    Q_INVOKABLE void dr_clear();
 
 private slots:
     void when_check_frame();
@@ -121,6 +134,8 @@ private:
     void load_calibration_data();
     void draw_cl_lines(QImage *img);
     void draw_det_result(const std::vector<QRect> &rcs, QImage *image);
+    void draw_dr_history(QImage *image);
+    void draw_dr_one(QPainter &p, const QVariantMap &oper);
 
 private:
     QString url_, info_;
@@ -141,6 +156,8 @@ private:
     DetectLoader *detect_loader_;
 
     KVConfig2 *cfg_;
+
+    QStack<QVariantMap> dr_opers;   // 需要画出来的历史命令 ...
 };
 
 #endif // MYPLAYER_H

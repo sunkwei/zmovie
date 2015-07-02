@@ -6,132 +6,159 @@ import QtQuick.Controls.Styles 1.2
 
 /** 教师标定属性 ... */
 
-Item {
-    property KVConfig kvc;          // 全局配置项 ...
+BorderImage {
     id: sv;
+    anchors.fill: parent;
+    source: "images/toolbar.png"
+    border.bottom: 8;
 
-    ColumnLayout {
-        id: teachers_config;
+    property KVConfig kvc;          // 全局配置项 ...
+    property var player;       // 对应着播放器 ...
 
-        // 云台服务 ..
-        MyKVPair {
-            id: id_kv_ptz_serial_name;
-            key: "ptz_serial_name";
-            value: kvc.get(key);
-            desc: qsTr("input ptz url");
-            Layout.fillWidth: true;
-            Layout.preferredHeight: 30;
+    ScrollView {
+        id: sv0;
+        anchors.fill: parent
 
-            onValueChanged: {
-                console.log(key + " changed to " + value);
-                kvc.set(key, value);
+        ColumnLayout {
+            id: teachers_config;
+            height: 500;  // 包含数个 MyKVPair + Button 的高度和 ..
+
+            // 云台服务 ..
+            MyKVPair {
+                id: id_kv_ptz_serial_name;
+                title: "云台服务地址";
+                key: "ptz_serial_name";
+                value: kvc.get(key);
+                desc: "输入云台服务的url，一般格式为 http://<ip>:10003/ptz/teacher";
             }
-        }
 
-        MyKVPair {
-            id: id_kv_ptz_addr;
-            key: "ptz_addr";
-            value: kvc.get("ptz_addr");
-            desc: qsTr("input ptz addr");
-            Layout.fillWidth: true;
-            Layout.preferredHeight: 30;
-
-            onValueChanged: {
-                console.log(key + " changed to " + value);
-                kvc.set(key, value);
+            // 探测源 url
+            MyKVPair {
+                id: id_kv_video_source;
+                title: "探测源url";
+                key: "video_source";
+                value: kvc.get(key);
+                desc: "输入教师探测ipcam的url，一般格式为 rtsp://<ip>/av0_0";
             }
-        }
 
-        // 探测源 url
-        MyKVPair {
-            id: id_kv_video_source;
-            key: "video_source";
-            value: kvc.get(key);
-            desc: qsTr("video source");
-            Layout.fillWidth: true;
-            Layout.preferredHeight: 30;
+            // 跟踪源 url
+            MyKVPair {
+                id: id_kv_video_source_tracing;
+                title: "跟踪源url";
+                key: "video_source_tracing";
+                value: kvc.get(key);
+                desc: "输入录播机教师特写的直播流地址，支持rtsp/rtmp两种格式";
 
-            onValueChanged: {
-                console.log(key + " changed to " + value);
-                kvc.set(key, value);
             }
-        }
 
-        // 跟踪源 url
-        MyKVPair {
-            id: id_kv_video_source_tracing;
-            key: "video_source_tracing";
-            value: kvc.get(key);
-            desc: qsTr("video source tracing");
-            Layout.fillWidth: true;
-            Layout.preferredHeight: 30;
-
-            onValueChanged: {
-                console.log(key + " changed to " + value);
-                kvc.set(key, value);
+            // luv_u_max
+            MyKVPair {
+                id: id_kv_luv_L;
+                title: "亮度信息"
+                key: "luv_L";
+                value: kvc.get(key);
+                desc: "一般选择 50";
             }
-        }
 
-        // 保存配置，并且返回 ..
-        Button {
-            text: "save & back";
-            style: touchStyle;
+            MyKVPair {
+                id: id_kv_luv_u_max;
+                title: "色度信息"
+                key: "luv_u_max";
+                value: kvc.get(key);
+                desc: "一般选择 23";
+            }
 
-            onClicked: {
-                focus = true;   // 这样能强制使 ...
+            MyKVPair {
+                id: id_kv_luv_v_max;
+                title: "色度信息"
+                key: "luv_v_max";
+                value: kvc.get(key);
+                desc: "一般选择 23";
+            }
 
-                kvc.save();
+            MyKVPair {
+                id: id_kv_t_body_width;
+                title: "人体宽度占图像像素个数"
+                key: "t_body_width";
+                value: kvc.get(key);
+                desc: "一般选择 40";
+            }
 
-                if (stackView) {
-                    stackView.pop();
+
+            // 保存配置，并且返回 ..
+            Button {
+                text: "保存设置并返回";
+                style: touchStyle;
+
+                onClicked: {
+                    focus = true;   // 这样能强制使 ...
+
+                    if (player) {
+                        player.item.save();
+                    }
+
+                    if (kvc.save() < 0) {
+                        infos.text = "保存配置参数失败!!!!";
+                    }
+                    else {
+                        infos.text = "保存配置成功";
+                    }
+
+                    if (stackView) {
+                        stackView.pop();
+                    }
                 }
             }
-        }
 
-        // 放弃保存
-        Button {
-            text: "cancel";
-            style: touchStyle;
+            // 放弃保存
+            Button {
+                text: "放弃设置并返回";
+                style: touchStyle;
 
-            onClicked: {
-                if (stackView) {
-                    stackView.pop();
+                onClicked: {
+                    if (stackView) {
+                        stackView.pop();
+                    }
+                    if (kvc.reload() < 0) {
+                        infos.text = "重新加载配置失败!!!!";
+                    }
+                    else {
+                        infos.text = "已经取消保存";
+                    }
                 }
-                kvc.reload()
             }
-        }
 
-        Component {
-            id: touchStyle
-            ButtonStyle {
-                panel: Item {
-                    implicitHeight: 50
-                    implicitWidth: 320
-                    BorderImage {
-                        anchors.fill: parent
-                        antialiasing: true
-                        border.bottom: 8
-                        border.top: 8
-                        border.left: 8
-                        border.right: 8
-                        anchors.margins: control.pressed ? -4 : 0
-                        source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
-                        Text {
-                            text: control.text
-                            anchors.centerIn: parent
-                            color: "white"
-                            font.pixelSize: 23
-                            renderType: Text.NativeRendering
+            Component {
+                id: touchStyle
+                ButtonStyle {
+                    panel: Item {
+                        implicitHeight: 30
+                        implicitWidth: 260
+                        BorderImage {
+                            anchors.fill: parent
+                            antialiasing: true
+                            border.bottom: 8
+                            border.top: 8
+                            border.left: 8
+                            border.right: 8
+                            anchors.margins: control.pressed ? -4 : 0
+                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
+                            Text {
+                                text: control.text
+                                anchors.centerIn: parent
+                                color: "white"
+                                font.pixelSize: 19
+                                renderType: Text.NativeRendering
+                            }
                         }
                     }
                 }
             }
         }
     }
-
     Component.onCompleted: {
         if (infos) {
-            infos.text = "teacher calibration";
+            infos.text = "正在进行教师标定";
         }
     }
 }

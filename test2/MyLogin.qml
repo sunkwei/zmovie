@@ -51,7 +51,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter;
 
                 Label {
-                    text: qsTr("input target ip");
+                    text: "输入跟踪机的ip";
                     font.pixelSize: 21
                     anchors.verticalCenter: parent.verticalCenter
                     color: "white";
@@ -69,7 +69,7 @@ Item {
             }
 
             Button {
-                text: "teacher";
+                text: "教师";
                 style: touchStyle;
                 Layout.alignment: Qt.AlignHCenter;
 
@@ -81,7 +81,7 @@ Item {
             }
 
             Button {
-                text: "student";
+                text: "学生";
                 style: touchStyle;
                 Layout.alignment: Qt.AlignHCenter;
 
@@ -93,7 +93,7 @@ Item {
             }
 
             Button {
-                text: "bd";
+                text: "板书";
                 style: touchStyle;
                 Layout.alignment: Qt.AlignHCenter;
 

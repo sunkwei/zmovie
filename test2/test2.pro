@@ -15,7 +15,7 @@ SOURCES += main.cpp \
     ptz.cpp
 
 lupdate_only {
-    SOURCES += MainForm.ui.qml
+    SOURCES +=
 }
 
 RESOURCES += qml.qrc
