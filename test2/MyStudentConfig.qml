@@ -56,7 +56,7 @@ BorderImage {
                 title: "距离阈值"
                 key: "thres_dis";
                 value: kvc.get(key);
-                desc: "经验值在 20 到 40 之间，一般选择25吧";
+                desc: "(修改立即生效)经验值在 20 到 40 之间，一般选择25吧";
 
                 onKvalueChanged: {
                     if (player) {
@@ -77,7 +77,7 @@ BorderImage {
                 title: "面积阈值"
                 key: "thres_area";
                 value: kvc.get(key);
-                desc: "经验值在 3000 到 8000 之间，建议选择 5000";
+                desc: "(修改立即生效)经验值在 3000 到 8000 之间，建议选择 5000";
 
                 onKvalueChanged: {
                     if (player) {
@@ -98,7 +98,7 @@ BorderImage {
                 title: "中间系数"
                 key: "factor_05";
                 value: kvc.get(key);
-                desc: "建议选择 0.4";
+                desc: "(修改立即生效)建议选择 0.4";
 
                 onKvalueChanged: {
                     if (player) {
@@ -119,7 +119,7 @@ BorderImage {
                 title: "后排系数"
                 key: "factor_0";
                 value: kvc.get(key);
-                desc: "一般选择 0.2";
+                desc: "(修改立即生效)一般选择 0.2";
 
                 onKvalueChanged: {
                     if (player) {

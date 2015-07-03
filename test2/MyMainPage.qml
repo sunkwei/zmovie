@@ -37,6 +37,9 @@ ColumnLayout {
             else if (who == "student") {
                 loader.setSource("MyStudentConfig.qml", { "kvc": kvc, "player": players });
             }
+            else if (who == "bd") {
+                loader.setSource("MyBDConfig.qml", { "kvc": kvc, "player": players });
+            }
         }
     }
 

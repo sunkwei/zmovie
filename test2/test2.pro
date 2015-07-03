@@ -12,7 +12,8 @@ SOURCES += main.cpp \
     detect/DetectLoader.cpp \
     cJSON.c \
     ptz/ptz0.cpp \
-    ptz.cpp
+    ptz.cpp \
+    myudpsocket.cpp
 
 lupdate_only {
     SOURCES +=
@@ -51,14 +52,17 @@ HEADERS += \
     zifimage.h \
     cJSON.h \
     ptz/ptz0.h \
-    ptz.h
+    ptz.h \
+    myudpsocket.h
 
 DISTFILES += \
+    MyPlayers.qml \
+    MyKVPair.qml \
     MyLogin.qml \
     MyMain.qml \
-    MyPlayers.qml \
+    MyMainPage.qml \
+    MyPlayersStudent.qml \
+    MyPlayersTeacher.qml \
     MyPtzControls.qml \
-    test.config \
-    MyKVPair.qml \
-    MyTest.qml \
-    MyStudentConfig.qml
+    MyStudentConfig.qml \
+    MyTeacherConfig.qml

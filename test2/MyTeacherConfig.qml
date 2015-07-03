@@ -48,7 +48,15 @@ BorderImage {
                 key: "video_source_tracing";
                 value: kvc.get(key);
                 desc: "输入录播机教师特写的直播流地址，支持rtsp/rtmp两种格式";
+            }
 
+            // trace_speeds
+            MyKVPair {
+                id: id_kv_trace_speeds;
+                title: "跟踪云台转动速度";
+                key: "trace_speeds";
+                value: kvc.get(key);
+                desc: "云台跟踪速度....";
             }
 
             // luv_u_max

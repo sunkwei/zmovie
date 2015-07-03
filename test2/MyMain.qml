@@ -2,7 +2,6 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
-import QtWebKit 3.0
 import zonekey.qd 1.4
 
 ApplicationWindow {
@@ -15,7 +14,51 @@ ApplicationWindow {
         id: kvc;
     }
 
+    property string target_ip: "";
     property alias infos: infos;
+    property alias mi_restart: mi_restart
+    property alias mi_start: mi_start
+    property alias mi_stop: mi_stop
+
+    menuBar: MenuBar {
+        Menu {
+            title: "操作";
+            MenuItem {
+                id: mi_restart;
+                text: "重新启动跟踪程序";
+                enabled: false;
+                onTriggered: {
+                    // 发送 restart 命令
+
+
+                    infos.text = "已经发出重新启动跟踪程序的命令"
+                }
+            }
+
+            MenuItem {
+                id: mi_start;
+                text: "开始跟踪";
+                enabled: false;
+                onTriggered: {
+
+                }
+            }
+
+            MenuItem {
+                id: mi_stop;
+                text: "停止跟踪";
+                enabled: false;
+                onTriggered: {
+
+                }
+            }
+
+            MenuItem {
+                text: "退出"
+                onTriggered: Qt.quit();
+            }
+        }
+    }
 
     toolBar: BorderImage {
         border.bottom: 8
@@ -130,10 +173,16 @@ ApplicationWindow {
             visible: false;
             anchors.centerIn: parent;
             onMyOk: {
-                var target_ip = login.ip;
+                var ip = login.ip;
                 var who = login.who;
                 var fname = who + "_detect_trace.config";
-                var config_url = "http://" + target_ip + ":8888/config/" + fname;
+                var config_url = "http://" + ip + ":8888/config/" + fname;
+
+                target_ip = ip;
+                mi_restart.enabled = true;
+                mi_start.enabled = true;
+                mi_stop.enabled = true;
+
                 kvc.fname = config_url; // 使用http接口 .
                 if (kvc.reload() < 0) {
                     infos.text = "can't load config from:" + config_url;
