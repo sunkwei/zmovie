@@ -29,8 +29,10 @@ ApplicationWindow {
                 enabled: false;
                 onTriggered: {
                     // 发送 restart 命令
-
-
+                    var array = new Uint8Array(2);
+                    array[0] = 09;
+                    array[1] = 01;
+                    alert(array[0]);
                     infos.text = "已经发出重新启动跟踪程序的命令"
                 }
             }

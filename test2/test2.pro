@@ -26,7 +26,7 @@ TRANSLATIONS = test2-zh_CN.ts test2-en_US.ts
 mac {
     QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
-    PKGCONFIG += libavcodec libavformat libswscale libswresample libccgnu2 libccext2
+    PKGCONFIG += libavcodec libavformat libswscale libswresample libccgnu2 libccext2 libcurl
 }
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
