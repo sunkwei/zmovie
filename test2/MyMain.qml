@@ -2,7 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
-import zonekey.qd 1.4
+import zonekey.qd 1.5
 
 ApplicationWindow {
     title: qsTr("zonekey player testing")
@@ -21,6 +21,10 @@ ApplicationWindow {
     property alias mi_stop: mi_stop
 
     menuBar: MenuBar {
+        UdpSocket {
+            id: sock;
+        }
+
         Menu {
             title: "操作";
             MenuItem {
@@ -29,11 +33,7 @@ ApplicationWindow {
                 enabled: false;
                 onTriggered: {
                     // 发送 restart 命令
-                    var array = new Uint8Array(2);
-                    array[0] = 09;
-                    array[1] = 01;
-                    alert(array[0]);
-                    infos.text = "已经发出重新启动跟踪程序的命令"
+                    sock.send_cmd_restart();
                 }
             }
 
@@ -42,7 +42,7 @@ ApplicationWindow {
                 text: "开始跟踪";
                 enabled: false;
                 onTriggered: {
-
+                    sock.send_cmd_start();
                 }
             }
 
@@ -51,7 +51,7 @@ ApplicationWindow {
                 text: "停止跟踪";
                 enabled: false;
                 onTriggered: {
-
+                    sock.send_cmd_stop();
                 }
             }
 
