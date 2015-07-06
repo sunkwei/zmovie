@@ -23,18 +23,18 @@ public:
     // 发送 09 01
     Q_INVOKABLE int send_cmd_restart()
     {
-        return send_bytes("\0x090x01", 2);
+        return send_bytes("\x09\x01", 2);
     }
 
     // 发送 08 01
     Q_INVOKABLE int send_cmd_start()
     {
-        return send_bytes("\0x080x01", 2);
+        return send_bytes("\x08\x01", 2);
     }
 
     Q_INVOKABLE int send_cmd_stop()
     {
-        return send_bytes("\0x080x03", 2);
+        return send_bytes("\x08\x03", 2);
     }
 
 signals:

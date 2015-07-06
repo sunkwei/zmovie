@@ -14,6 +14,10 @@ ApplicationWindow {
         id: kvc;
     }
 
+    UdpSocket {
+        id: sock;
+    }
+
     property string target_ip: "";
     property alias infos: infos;
     property alias mi_restart: mi_restart
@@ -21,10 +25,6 @@ ApplicationWindow {
     property alias mi_stop: mi_stop
 
     menuBar: MenuBar {
-        UdpSocket {
-            id: sock;
-        }
-
         Menu {
             title: "操作";
             MenuItem {
@@ -32,7 +32,7 @@ ApplicationWindow {
                 text: "重新启动跟踪程序";
                 enabled: false;
                 onTriggered: {
-                    // 发送 restart 命令
+                    // 发送 restart 命令.
                     sock.send_cmd_restart();
                 }
             }
@@ -48,7 +48,7 @@ ApplicationWindow {
 
             MenuItem {
                 id: mi_stop;
-                text: "停止跟踪";
+                text: "停止跟踪"
                 enabled: false;
                 onTriggered: {
                     sock.send_cmd_stop();
@@ -184,6 +184,8 @@ ApplicationWindow {
                 mi_restart.enabled = true;
                 mi_start.enabled = true;
                 mi_stop.enabled = true;
+                sock.targetHost = ip;
+                sock.targetPort = 8642;
 
                 kvc.fname = config_url; // 使用http接口 .
                 if (kvc.reload() < 0) {
