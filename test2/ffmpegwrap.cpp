@@ -51,7 +51,10 @@ int ffmpegWrap::run_once()
 
 int ffmpegWrap::open_url()
 {
-    int rc = avformat_open_input(&ic_, url_.c_str(), 0, 0);
+    AVDictionary *dict = 0;
+    av_dict_set(&dict, "stimeout", "2000000", 0);	// stimeout 为 tcp io 超时，微秒
+    int rc = avformat_open_input(&ic_, url_.c_str(), 0, &dict);
+    av_dict_free(&dict);
     if (rc != 0) {
         return rc;
     }

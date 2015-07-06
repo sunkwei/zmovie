@@ -18,5 +18,7 @@
         <file>images/textinput.png</file>
         <file>images/toolbar.png</file>
         <file>MyPlayersStudent.qml</file>
+        <file>MyBDConfig.qml</file>
+        <file>MyPlayersBD.qml</file>
     </qresource>
 </RCC>
