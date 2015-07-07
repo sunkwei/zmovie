@@ -9,6 +9,7 @@ AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_CC_STDC
 
 # Checks for libraries.
 
@@ -19,6 +20,7 @@ AC_CHECK_HEADERS([stdlib.h])
 
 # Checks for library functions.
 PKG_CHECK_MODULES(avformat, libavformat)
+PKG_CHECK_MODULES(avutil, libavutil)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
