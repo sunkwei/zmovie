@@ -60,7 +60,7 @@ BorderImage {
         y: 40;
         onPressedChanged: {
             if (pressed) {
-                myPanTiltMoving("up");
+                myPanTiltMoving("up")
                 ptz.up(1);
             }
             else {

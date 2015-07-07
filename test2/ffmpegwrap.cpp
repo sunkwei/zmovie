@@ -1,4 +1,5 @@
 #include "ffmpegwrap.h"
+#include <QtGlobal>
 
 class FFMPEGInit
 {
@@ -8,6 +9,15 @@ public:
         av_register_all();
         avcodec_register_all();
         avformat_network_init();
+        av_log_set_callback(log);
+    }
+
+    static void log(void *avcl, int level, const char *fmt, va_list args)
+    {
+        char line[1024];
+        int print_prefix = 1;
+        av_log_format_line(avcl, level, fmt, args, line, sizeof(line), &print_prefix);
+        qDebug(line);
     }
 };
 
@@ -87,7 +97,7 @@ int ffmpegWrap::next_frame()
         }
     }
 
-    rc = decode_frame(ic_->streams[pkg_.stream_index]->codec, &pkg_);
+    rc = decode_frame(ic_->streams[pkg_.stream_index], &pkg_);
 
     if (pkg_.size == 0) {
         av_free_packet(&pkg_);
@@ -96,14 +106,13 @@ int ffmpegWrap::next_frame()
     return rc;
 }
 
-int ffmpegWrap::decode_frame(AVCodecContext *cc, AVPacket *pkt)
+int ffmpegWrap::decode_frame(AVStream *stream, AVPacket *pkt)
 {
     int rc = RC_FAILURE;
     int got;
-    if (cc->codec_type == AVMEDIA_TYPE_AUDIO) {
-        rc = avcodec_decode_audio4(cc, frame_, &got, pkt);
+    if (stream->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        rc = avcodec_decode_audio4(stream->codec, frame_, &got, pkt);
         if (got) {
-
             double stamp = audio_sample_cnt_ * 1.0 / frame_->sample_rate;
             cb_->on_audio_frame(pkt->stream_index, frame_, stamp);
             audio_sample_cnt_ += frame_->nb_samples;
@@ -120,11 +129,10 @@ int ffmpegWrap::decode_frame(AVCodecContext *cc, AVPacket *pkt)
 
         return 0;
     }
-    else if (cc->codec_type == AVMEDIA_TYPE_VIDEO){
-        rc = avcodec_decode_video2(cc, frame_, &got, pkt);
+    else if (stream->codec->codec_type == AVMEDIA_TYPE_VIDEO){
+        rc = avcodec_decode_video2(stream->codec, frame_, &got, pkt);
         if (got) {
-            double stamp = pkt->pts * 1.0 * cc->time_base.num /
-                    cc->time_base.den *cc->ticks_per_frame; // FIXME: * ticks_per_frame ...
+            double stamp = pkt->pts * 1.0 * stream->time_base.num / stream->time_base.den;
             cb_->on_video_frame(pkt->stream_index, frame_, stamp);
         }
 

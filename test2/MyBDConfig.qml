@@ -50,46 +50,31 @@ BorderImage {
                 desc: "输入录播机教师特写的直播流地址，支持rtsp/rtmp两种格式";
             }
 
-            // trace_speeds
+            //bg_learning_rate=0.001 背景更新速度
             MyKVPair {
-                id: id_kv_trace_speeds;
-                title: "跟踪云台转动速度";
-                key: "trace_speeds";
+                id: id_kv_bg_learning_rate;
+                title: "背景更新速度";
+                key: "bg_learning_rate";
                 value: kvc.get(key);
-                desc: "云台跟踪速度....";
+                desc: "除非你知道正在干啥，否则不要修改该值";
             }
 
-            // luv_u_max
+            // bg_mog_threshold=135 图像二值化阈值
             MyKVPair {
-                id: id_kv_luv_L;
-                title: "亮度信息"
-                key: "luv_L";
+                id: id_kv_bg_mog_threshold
+                title: "图像二值化阈值";
+                key: "bg_mog_threshold";
                 value: kvc.get(key);
-                desc: "一般选择 50";
+                desc: "除非你知道正在干啥，否则不要修改该值";
             }
 
+            //bg_varThreshold=60 高斯动态背景阈值
             MyKVPair {
-                id: id_kv_luv_u_max;
-                title: "色度信息"
-                key: "luv_u_max";
+                id: id_kv_bg_varThreshold;
+                title: "高斯动态背景阈值";
+                key: "bg_varThreshold";
                 value: kvc.get(key);
-                desc: "一般选择 23";
-            }
-
-            MyKVPair {
-                id: id_kv_luv_v_max;
-                title: "色度信息"
-                key: "luv_v_max";
-                value: kvc.get(key);
-                desc: "一般选择 23";
-            }
-
-            MyKVPair {
-                id: id_kv_t_body_width;
-                title: "人体宽度占图像像素个数";
-                key: "t_body_width";
-                value: kvc.get(key);
-                desc: "一般选择 40";
+                desc: "除非你知道正在干啥，否则不要修改该值";
             }
 
 

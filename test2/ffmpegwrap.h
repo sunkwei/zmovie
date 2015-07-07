@@ -44,7 +44,7 @@ public:
 private:
     int open_url();
     int next_frame();
-    int decode_frame(AVCodecContext *cc, AVPacket *pkt);
+    int decode_frame(AVStream *stream, AVPacket *pkt);
 };
 
 #endif // FFMPEGWRAP_H
