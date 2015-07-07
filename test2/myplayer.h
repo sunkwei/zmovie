@@ -77,6 +77,7 @@ class MyPlayer : public QQuickPaintedItem
     Q_PROPERTY(bool cl_enabled READ cl_enabled WRITE cl_setEnabled NOTIFY cl_enabledChanged)
     Q_PROPERTY(double cache_duration READ cache_duration WRITE setCache_duration NOTIFY cache_durationChanged)
     Q_PROPERTY(bool det_enabled READ det_enabled WRITE det_setEnabled NOTIFY det_enabledChanged)
+    Q_PROPERTY(QString cl_points_desc READ cl_points_desc WRITE setCl_points_desc NOTIFY cl_points_descChanged)
 
 public:
     MyPlayer();
@@ -88,6 +89,9 @@ public:
 
     bool cl_enabled() const { return cl_enabled_; }
     void cl_setEnabled(bool enable) { cl_enabled_ = enable; }
+
+    QString cl_points_desc() const;
+    void setCl_points_desc(const QString &desc);
 
     bool det_enabled() const { return det_enabled_; }
     void det_setEnabled(bool e);
@@ -102,9 +106,6 @@ public:
     Q_INVOKABLE void cl_push_point(int x, int y);
     Q_INVOKABLE void cl_pop_point();
     Q_INVOKABLE void cl_remove_all_points();
-    Q_INVOKABLE int cl_points();
-    Q_INVOKABLE QString cl_points_desc(); // 返回需要保存的格式 ...
-    Q_INVOKABLE void cl_save();
 
     Q_INVOKABLE void det_set_params(double thres_dis, double thres_area, double factor_0, double factor_05);
 
@@ -126,12 +127,13 @@ private slots:
 signals:
     void urlChanged();
     void cl_enabledChanged();
+    void cl_points_descChanged();
     void cache_durationChanged();
     void det_enabledChanged(bool);
 
 private:
     void check_video_frame(double now);
-    void load_calibration_data();
+    void load_calibration_data(const QString &desc);
     void draw_cl_lines(QImage *img);
     void draw_det_result(const std::vector<QRect> &rcs, QImage *image);
     void draw_dr_history(QImage *image);

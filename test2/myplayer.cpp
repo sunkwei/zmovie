@@ -33,8 +33,6 @@ MyPlayer::MyPlayer()
     det_enabled_ = false;
     detect_loader_ = 0;
 
-    load_calibration_data();
-
     /** 设置默认缓冲时间 .. */
     duration_ = 0.0;
 }
@@ -467,9 +465,10 @@ qint64 AudioBuffer::writeData(const char *data, qint64 len)
     return 0;
 }
 
-void MyPlayer::load_calibration_data()
+void MyPlayer::load_calibration_data(const QString &desc)
 {
-    char *p = ::strdup(cfg_->get_value("calibration_data", ""));
+    cl_points_.clear();
+    char *p = ::strdup(desc.toStdString().c_str());
     char *q = strtok(p, ";");
     while (q) {
         int x, y;
@@ -492,11 +491,6 @@ void MyPlayer::when_cl_enabledChanged()
     }
 }
 
-int MyPlayer::cl_points()
-{
-    return cl_points_.size();
-}
-
 void MyPlayer::cl_push_point(int x, int y)
 {
     if (cl_enabled()) {
@@ -516,28 +510,29 @@ void MyPlayer::cl_remove_all_points()
     cl_points_.clear();
 }
 
-QString MyPlayer::cl_points_desc()
-{
-    std::stringstream ss;
-    for (size_t i = 0; i < cl_points_.size(); i++) {
-        int x = cl_points_[i].x() * atoi(cfg_->get_value("video_width", "480")) / width();
-        int y = cl_points_[i].y() * atoi(cfg_->get_value("video_height", "270")) / height();
-        ss << x << ',' << y << ';';
-    }
-
-    return ss.str().c_str();
-}
-
-void MyPlayer::cl_save()
+QString MyPlayer::cl_points_desc() const
 {
     if (cl_enabled()) {
-        QString s = cl_points_desc();
-        cfg_->set_value("calibration_data", s.toStdString().c_str());
-        cfg_->save_as();
-
-        if (detect_loader_) {
-            detect_loader_->reopen();
+        std::stringstream ss;
+        ss << "";
+        for (size_t i = 0; i < cl_points_.size(); i++) {
+            int x = cl_points_[i].x() * atoi(cfg_->get_value("video_width", "480")) / width();
+            int y = cl_points_[i].y() * atoi(cfg_->get_value("video_height", "270")) / height();
+            ss << x << ',' << y << ';';
         }
+
+        return ss.str().c_str();
+    }
+    else {
+        return "";
+    }
+}
+
+void MyPlayer::setCl_points_desc(const QString &desc)
+{
+    // TODO:
+    if (cl_enabled()) {
+        load_calibration_data(desc);
     }
 }
 

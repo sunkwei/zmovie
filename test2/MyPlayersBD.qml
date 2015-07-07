@@ -78,7 +78,7 @@ Item {
 
                 function func_unchecked(who)
                 {
-                    console.log("func_unchecked ..." + who)
+                    console.log("func_unchecked ..." + who);
                     var pos;
 
                     // 这里保存 ...
@@ -99,30 +99,18 @@ Item {
                         kvc.set("ptz_init_y", pos.y);
 
                         var zoom = ptz_controls.ptz.get_zoom();
-                        if (zoom.err != 0) {
+                        if (zoom.err !== 0) {
                             infos.text = "无法得到云台当前的倍率";
                             return;
                         }
 
                         kvc.set("ptz_init_z", zoom.zoom);
                     }
-                    else if (who === btn_ptz_left) {
-                        pos = ptz_controls.ptz.get_pos();
-                        if (pos.err !== 0) {
-                            infos.text = "无法得到云台当前位置";
-                            return;
-                        }
-
-                        kvc.set("ptz_init_left", pos.x);
-                    }
-                    else if (who === btn_ptz_right) {
-                        pos = ptz_controls.ptz.get_pos();
-                        if (pos.err !== 0) {
-                            infos.text = "无法得到云台当前位置";
-                            return;
-                        }
-
-                        kvc.set("ptz_init_right", pos.x);
+                    else if (who === btn_draw_detect_range2) {
+                        // 画第二块标定区 ...
+                        var desc2 = player_detector.cl_points_desc;
+                        kvc.set("calibration_data2", desc2);
+                        player_detector.cl_enabled = false;
                     }
                 }
 
@@ -151,31 +139,14 @@ Item {
                         var z = kvc.get("ptz_init_z");
                         ptz_controls.reset(x, y, z);
                     }
-                    else if (who === btn_ptz_left) {
+                    else if (who === btn_draw_detect_range2) {
+                        // 画第二块标定区 ..
                         if (infos) {
-                            infos.text = "转动云台，使右侧视频中红线对准教师探测区的最左侧的黄线";
+                            infos.text = "画出第二块标定区，如果不需要，则右键删除所有标定点即可";
                         }
 
-                        // 在探测源中间划红色竖线，方便左右转动时对齐 ...
-                        player_tracing.dr_push({"name":"line", "x0":240, "y0":0, "x1":240, "y1":270});
                         player_detector.cl_enabled = true;
-
-                        var x = kvc.get("ptz_init_left");
-                        var y = kvc.get("ptz_init_y");
-                        ptz.set_pos(x, y, 36, 36);
-                    }
-                    else if (who === btn_ptz_right) {
-                        if (infos) {
-                            infos.text = "转动云台，使右侧视频中红线对准教师探测区的最右侧的黄线";
-                        }
-
-                        // 在探测源中间划红色竖线，方便左右转动时对齐 ...
-                        player_tracing.dr_push({"name":"line", "x0":240, "y0":0, "x1":240, "y1":270})
-                        player_detector.cl_enabled = true;
-
-                        var x = kvc.get("ptz_init_right");
-                        var y = kvc.get("ptz_init_y");
-                        ptz.set_pos(x, y, 36, 36);
+                        player_detector.cl_points_desc = kvc.get("calibration_data2");
                     }
                 }
 
@@ -233,29 +204,8 @@ Item {
                 }
 
                 RadioButton {
-                    id: btn_ptz_left;
-                    text: "左侧标定";
-                    exclusiveGroup: tabPositionGroup
-                    onCheckedChanged: {
-                        if (checked) {
-                            if (parent.curr_checked) {
-                                parent.func_unchecked(parent.curr_checked);
-                            }
-
-                            parent.curr_checked = this;
-                            parent.func_checked(this);
-                        }
-                        else {
-                            if (this === parent.curr_checked) {
-                                parent.func_unchecked(this);
-                            }
-                        }
-                    }
-                }
-
-                RadioButton {
-                    id: btn_ptz_right;
-                    text: "右侧标定";
+                    id: btn_draw_detect_range2;
+                    text: "第二块标定区";
                     exclusiveGroup: tabPositionGroup
                     onCheckedChanged: {
                         if (checked) {
@@ -288,12 +238,8 @@ Item {
             btn_init_ptz.checked = false;
         }
 
-        if (btn_ptz_left.checked) {
-            btn_ptz_left.checked = false;
-        }
-
-        if (btn_ptz_right.checked) {
-            btn_ptz_right.checked = false;
+        if (btn_draw_detect_range2.checked) {
+            btn_draw_detect_range2.checked = false;
         }
     }
 

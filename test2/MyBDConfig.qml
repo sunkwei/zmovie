@@ -17,7 +17,7 @@ BorderImage {
 
     ScrollView {
         id: sv0;
-        anchors.fill: parent;
+        anchors.fill: parent
 
         ColumnLayout {
             id: teachers_config;
@@ -88,7 +88,7 @@ BorderImage {
                 id: id_kv_t_body_width;
                 title: "人体宽度占图像像素个数";
                 key: "t_body_width";
-                value: kvc.get(key)
+                value: kvc.get(key);
                 desc: "一般选择 40";
             }
 

@@ -48,7 +48,7 @@ ApplicationWindow {
 
             MenuItem {
                 id: mi_stop;
-                text: "停止跟踪"
+                text: "停止跟踪";
                 enabled: false;
                 onTriggered: {
                     sock.send_cmd_stop();
@@ -56,7 +56,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: "退出"
+                text: "退出";
                 onTriggered: Qt.quit();
             }
         }
@@ -78,7 +78,7 @@ ApplicationWindow {
             antialiasing: true
             height: 30
             radius: 4
-            color: backmouse.pressed ? "#222" : "transparent"
+            color: backmouse.pressed ? "#222" : "transparent";
             Behavior on opacity { NumberAnimation{} }
             Image {
                 anchors.verticalCenter: parent.verticalCenter

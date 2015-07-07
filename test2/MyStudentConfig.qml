@@ -53,9 +53,9 @@ BorderImage {
             // thres_dis
             MyKVPair {
                 id: id_kv_thres_dis;
-                title: "距离阈值"
+                title: "距离阈值";
                 key: "thres_dis";
-                value: kvc.get(key);
+                value: kvc.get(key)
                 desc: "(修改立即生效)经验值在 20 到 40 之间，一般选择25吧";
 
                 onKvalueChanged: {
