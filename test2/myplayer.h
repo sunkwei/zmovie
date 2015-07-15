@@ -12,6 +12,7 @@
 #include "kvconfig2.h"
 #include "detect/DetectLoader.h"
 #include <QStack>
+#include <math.h>
 
 extern KVConfig2 *_cfg;
 
@@ -78,6 +79,8 @@ class MyPlayer : public QQuickPaintedItem
     Q_PROPERTY(double cache_duration READ cache_duration WRITE setCache_duration NOTIFY cache_durationChanged)
     Q_PROPERTY(bool det_enabled READ det_enabled WRITE det_setEnabled NOTIFY det_enabledChanged)
     Q_PROPERTY(QString cl_points_desc READ cl_points_desc WRITE setCl_points_desc NOTIFY cl_points_descChanged)
+    Q_PROPERTY(bool rt_enabled READ rt_enabled WRITE setRt_enabled NOTIFY rt_enabledChanged)
+
 
 public:
     MyPlayer();
@@ -88,7 +91,10 @@ public:
     void setUrl(const QString &url) { url_ = url; }
 
     bool cl_enabled() const { return cl_enabled_; }
-    void cl_setEnabled(bool enable) { cl_enabled_ = enable; }
+    void cl_setEnabled(bool enable)
+    {
+        cl_enabled_ = enable;
+    }
 
     QString cl_points_desc() const;
     void setCl_points_desc(const QString &desc);
@@ -99,6 +105,64 @@ public:
     double cache_duration() const { return duration_; }
     void setCache_duration(double d) { duration_ = d; }
 
+    bool rt_enabled() const { return rt_enabled_; }
+    void setRt_enabled(bool enabled)
+    {
+        rt_enabled_ = enabled;
+    }
+
+    /** 左键按住，拖动 ...
+     */
+    Q_INVOKABLE void rt_tracking(const QPoint &p1, const QPoint &p2)
+    {
+        if (rt_enabled_) {
+            rt_p1_ = p1;
+            rt_p2_ = p2;
+        }
+    }
+
+    /** 左键释放，如果 p1,p2 很近，则认为是尝试选中某个框 ...
+     */
+    Q_INVOKABLE void rt_tracked(const QPoint &p1, const QPoint &p2)
+    {
+        if (!rt_enabled_) {
+            return;
+        }
+
+        float dx = p1.x() - p2.x(), dy = p1.y() - p2.y();
+        if (sqrt(dx*dx + dy*dy) < 3.0) {
+            // 算作选中吧 ...
+        }
+        else {
+            rt_p1_ = p1, rt_p2_ = p2;
+        }
+    }
+
+    /** 右键释放，则删除 ...
+     */
+    Q_INVOKABLE void rt_clear()
+    {
+        if (!rt_enabled_) {
+            return;
+        }
+
+        rt_p1_ = QPoint(-1, -1);
+    }
+
+    /** 返回框框 */
+    Q_INVOKABLE QString rt_desc() const
+    {
+        if (!rt_enabled_) {
+            return "";
+        }
+        else {
+            char buf[128];
+            snprintf(buf, sizeof(buf), "(%d,%d),(%d,%d)",
+                     rt_p1_.x(), rt_p1_.y(),
+                     rt_p2_.x(), rt_p2_.y());
+            return buf;
+        }
+    }
 
     Q_INVOKABLE void play();
     Q_INVOKABLE void stop();
@@ -130,6 +194,7 @@ signals:
     void cl_points_descChanged();
     void cache_durationChanged();
     void det_enabledChanged(bool);
+    void rt_enabledChanged();
 
 private:
     void check_video_frame(double now);
@@ -138,6 +203,7 @@ private:
     void draw_det_result(const std::vector<QRect> &rcs, QImage *image);
     void draw_dr_history(QImage *image);
     void draw_dr_one(QPainter &p, const QVariantMap &oper);
+    void draw_rt(QImage *img);
 
 private:
     QString url_, info_;
@@ -151,6 +217,9 @@ private:
 
     bool cl_enabled_;
     std::deque<QPoint> cl_points_;
+
+    bool rt_enabled_;   // 是否允许鼠标画橡皮筋 ...
+    QPoint rt_p1_, rt_p2_;  // 需要画的矩形的两个点 ...
 
     double duration_;
 

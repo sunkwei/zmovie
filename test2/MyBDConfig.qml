@@ -76,82 +76,27 @@ BorderImage {
                 value: kvc.get(key);
                 desc: "除非你知道正在干啥，否则不要修改该值";
             }
-
-
-            // 保存配置，并且返回 ..
-            Button {
-                text: "保存设置并返回";
-                style: touchStyle;
-
-                onClicked: {
-                    focus = true;   // 这样能强制使 ...
-
-                    if (player) {
-                        player.item.save();
-                    }
-
-                    if (kvc.save() < 0) {
-                        infos.text = "保存配置参数失败!!!!";
-                    }
-                    else {
-                        infos.text = "保存配置成功";
-                    }
-
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                }
-            }
-
-            // 放弃保存
-            Button {
-                text: "放弃设置并返回";
-                style: touchStyle;
-
-                onClicked: {
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                    if (kvc.reload() < 0) {
-                        infos.text = "重新加载配置失败!!!!";
-                    }
-                    else {
-                        infos.text = "已经取消保存";
-                    }
-                }
-            }
-
-            Component {
-                id: touchStyle
-                ButtonStyle {
-                    panel: Item {
-                        implicitHeight: 30
-                        implicitWidth: 260
-                        BorderImage {
-                            anchors.fill: parent
-                            antialiasing: true
-                            border.bottom: 8
-                            border.top: 8
-                            border.left: 8
-                            border.right: 8
-                            anchors.margins: control.pressed ? -4 : 0
-                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
-                            Text {
-                                text: control.text
-                                anchors.centerIn: parent
-                                color: "white"
-                                font.pixelSize: 19
-                                renderType: Text.NativeRendering
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
     Component.onCompleted: {
         if (infos) {
-            infos.text = "正在进行教师标定";
+            infos.text = "正在进行板书标定";
         }
+    }
+
+    function save()
+    {
+        if (kvc.save() < 0) {
+            infos.text = "保存配置参数失败!!!!";
+        }
+        else {
+            infos.text = "保存配置成功";
+        }
+    }
+
+    function cancel()
+    {
+        kvc.reload();
+        infos.text = "已经取消";
     }
 }

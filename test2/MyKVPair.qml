@@ -37,18 +37,8 @@ Item {
             style: touchStyle_txt;
             font.pointSize: 13;
 
-            onFocusChanged: {
-                if (!focus) {
-                    if (value !== text) {
-                        value = text.trim();
-                        if (kvc) {
-                            kvc.set(key, value);
-                        }
-                    }
-                }
-            }
-
             onTextChanged: {
+                kvc.set(key, text); // 总是立即写入 kvc ...
                 kvalueChanged(text);    // 随时生效 ...
             }
         }

@@ -124,6 +124,11 @@ Item {
 
                         kvc.set("ptz_init_right", pos.x);
                     }
+                    else if (who === btn_y_adjust) {
+                        var desc = player_detector.cl_points_desc;
+                        kvc.set("upbody_calibration_data", desc);
+                        player_detector.cl_enabled = false;
+                    }
                 }
 
                 function func_checked(who)
@@ -176,6 +181,16 @@ Item {
                         var x = kvc.get("ptz_init_right");
                         var y = kvc.get("ptz_init_y");
                         ptz.set_pos(x, y, 36, 36);
+                    }
+                    else if (who === btn_y_adjust) {
+                        if (infos) {
+                            infos.text = "画出矩形，标定教师高度调节的范围和高度";
+                        }
+
+                        // upbody_calibration_data=100,44;377,45;275,98,107,98;
+                        var upbody_calibration_data = kvc.get("upbody_calibration_data");
+                        player_detector.cl_enabled = true;
+                        player_detector.cl_points_desc = upbody_calibration_data;
                     }
                 }
 
@@ -273,6 +288,27 @@ Item {
                         }
                     }
                 }
+
+                RadioButton {
+                    id: btn_y_adjust;
+                    text: "教师高度标定";
+                    exclusiveGroup: tabPositionGroup
+                    onCheckedChanged: {
+                        if (checked) {
+                            if (parent.curr_checked) {
+                                parent.func_unchecked(parent.curr_checked);
+                            }
+
+                            parent.curr_checked = this;
+                            parent.func_checked(this);
+                        }
+                        else {
+                            if (this === parent.curr_checked) {
+                                parent.func_unchecked(this);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -295,6 +331,15 @@ Item {
         if (btn_ptz_right.checked) {
             btn_ptz_right.checked = false;
         }
+
+        if (btn_y_adjust.checked) {
+            btn_y_adjust.checked = false;
+        }
+    }
+
+    function cancel()
+    {
+
     }
 
     Component.onCompleted: {

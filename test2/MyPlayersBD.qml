@@ -243,6 +243,11 @@ Item {
         }
     }
 
+    function cancel()
+    {
+
+    }
+
     Component.onCompleted: {
         if (!kvc) {
             console.error("kvc is NULL????");

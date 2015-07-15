@@ -1,13 +1,14 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.2
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
 import zonekey.qd 1.5
 
 ApplicationWindow {
     title: qsTr("zonekey player testing")
-    width: 1280
-    height: 768
+    width: 1440
+    height: 900
     visible: true
 
     KVConfig {
@@ -48,7 +49,7 @@ ApplicationWindow {
 
             MenuItem {
                 id: mi_stop;
-                text: "停止跟踪"
+                text: "停止跟踪";
                 enabled: false;
                 onTriggered: {
                     sock.send_cmd_stop();
@@ -67,7 +68,7 @@ ApplicationWindow {
         source: "images/toolbar.png"
         width: parent.width
         height: 50
-
+/*
         Rectangle {
             id: backButton
             width: opacity ? 30 : 0
@@ -106,6 +107,68 @@ ApplicationWindow {
             color: "white"
             text: qsTr("login")
         }
+*/
+        RowLayout {
+            spacing: 20;
+            anchors.centerIn: parent;
+            opacity: stackView.depth > 1 ? 1 : 0
+
+            Button {
+                id: button_save_current;
+                text: "保存当前，并返回";
+                style: touchStyleButton;
+
+                onClicked: {
+                    // 保存当前配置，返回上一级 ...
+                    if (stackView.depth > 1) {
+                        stackView.currentItem.save();
+                        stackView.pop();
+                    }
+                }
+            }
+
+            Button {
+                id: button_cancel;
+                text: "放弃修改，并返回";
+                style: touchStyleButton;
+
+                onClicked: {
+                    if (stackView.depth > 1) {
+                        stackView.currentItem.cancel();
+                        stackView.pop();
+                    }
+                }
+            }
+        }
+
+        Component {
+            id: touchStyleButton
+            ButtonStyle {
+                panel: Item {
+                    implicitHeight: 30
+                    implicitWidth: 260
+                    BorderImage {
+                        anchors.fill: parent
+                        antialiasing: true
+                        border.bottom: 8
+                        border.top: 8
+                        border.left: 8
+                        border.right: 8
+                        anchors.margins: control.pressed ? -4 : 0
+                        source: control.pressed ? "images/button_pressed.png" : control.hovered ?
+                                                      "images/button_hover.png" : "images/button_default.png";
+                        Text {
+                            text: control.text
+                            anchors.centerIn: parent
+                            color: "white"
+                            font.pixelSize: 19
+                            renderType: Text.NativeRendering
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     statusBar: BorderImage {
@@ -168,6 +231,30 @@ ApplicationWindow {
                     to: 0
                 }
             }
+        }
+
+        function mydump(arr,level) {
+            var dumped_text = "";
+            if(!level) level = 0;
+
+            var level_padding = "";
+            for(var j=0;j<level+1;j++) level_padding += "    ";
+
+            if(typeof(arr) == 'object') {
+                for(var item in arr) {
+                    var value = arr[item];
+
+                    if(typeof(value) == 'object') {
+                        dumped_text += level_padding + "'" + item + "' ...\n";
+                        dumped_text += mydump(value,level+1);
+                    } else {
+                        dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+                    }
+                }
+            } else {
+                dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+            }
+            return dumped_text;
         }
 
         initialItem: MyLogin {

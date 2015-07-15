@@ -20,5 +20,6 @@
         <file>MyPlayersStudent.qml</file>
         <file>MyBDConfig.qml</file>
         <file>MyPlayersBD.qml</file>
+        <file>images/button_hover.png</file>
     </qresource>
 </RCC>

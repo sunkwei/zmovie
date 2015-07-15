@@ -32,6 +32,7 @@ MyPlayer::MyPlayer()
     cl_enabled_ = false;
     det_enabled_ = false;
     detect_loader_ = 0;
+    rt_enabled_ = false;
 
     /** 设置默认缓冲时间 .. */
     duration_ = 0.0;
@@ -326,6 +327,26 @@ void MyPlayer::draw_dr_history(QImage *image)
     }
 }
 
+void MyPlayer::draw_rt(QImage *img)
+{
+    if (!rt_enabled()) {
+        return;
+    }
+
+    if (rt_p1_.x() > 0) {
+        QRect r(rt_p1_, rt_p2_);
+
+        QPen pen(QColor(255, 255, 0));
+        pen.setWidth(3);
+
+        QPainter p;
+        p.begin(img);
+        p.setPen(pen);
+        p.drawRect(r);
+        p.end();
+    }
+}
+
 void MyPlayer::paint(QPainter *painter)
 {
     if (img_rending_ && th_) {
@@ -349,6 +370,7 @@ void MyPlayer::paint(QPainter *painter)
         }
 
         draw_dr_history(img);   // 画可能的 ...
+        draw_rt(img);
 
         painter->drawImage(r, *img);
         th_->unlock_picture(img_rending_);

@@ -1,6 +1,6 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.2
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
 import zonekey.qd 1.4
 
@@ -14,7 +14,6 @@ BorderImage {
     signal myPreset(string cmd, int idx);
 
     Component.onCompleted: {
-        console.log("my size:" + width + "," + height);
     }
 
     property Ptz ptz;
@@ -39,7 +38,8 @@ BorderImage {
                     border.left: 8
                     border.right: 8
                     anchors.margins: control.pressed ? -4 : 0
-                    source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
+                    source: control.pressed ? "images/button_pressed.png" : control.hovered ?
+                                                  "images/button_hover.png" : "images/button_default.png";
                     Text {
                         text: control.text
                         anchors.centerIn: parent
@@ -47,6 +47,26 @@ BorderImage {
                         font.pixelSize: 23
                         renderType: Text.NativeRendering
                     }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: touchStyle_txt
+
+        TextFieldStyle {
+            textColor: "white";
+            background: Item {
+                implicitHeight: 50
+                implicitWidth: 320
+                BorderImage {
+                    source: "../images/textinput.png"
+                    border.left: 8
+                    border.right: 8
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                 }
             }
         }
@@ -106,7 +126,6 @@ BorderImage {
         }
     }
 
-
     Button {
         id: button_down
         text: "下";
@@ -159,138 +178,62 @@ BorderImage {
                 myZoomChanging("stop");
             }
         }
-
     }
 
-    /*
-    ColumnLayout {
-        spacing: 2
-
-        Button {
-            id: button_up
-            text: qsTr("up");
-            onPressedChanged: {
-                if (pressed) {
-                    myPanTiltMoving("up");
-                    ptz.up(1);
-                }
-                else {
-                    ptz.stop();
-                    myPanTiltMoving("stop");
-                }
-            }
-        }
-
-        Button {
-            id: button_left
-            text: qsTr("left")
-            onPressedChanged: {
-                if (pressed) {
-                    myPanTiltMoving("left");
-                    ptz.left(1);
-                }
-                else {
-                    ptz.stop();
-                    myPanTiltMoving("stop");
-                }
-            }
-        }
-
-        Button {
-            id: button_right
-            text: qsTr("right");
-            onPressedChanged: {
-                if (pressed) {
-                    ptz.right(1);
-                    myPanTiltMoving("right");
-                }
-                else {
-                    ptz.stop();
-                    myPanTiltMoving("stop");
-                }
-            }
-        }
-
-        Button {
-            id: button_down
-            text: qsTr("down");
-            onPressedChanged: {
-                if (pressed) {
-                    ptz.down(1);
-                    myPanTiltMoving("down");
-                }
-                else {
-                    ptz.stop();
-                    myPanTiltMoving("stop");
-                }
-            }
-        }
-
-        Button {
-            id: button_tele
-            text: qsTr("tele");
-            onPressedChanged: {
-                if (pressed) {
-                    ptz.zoom_tele(1);
-                    myZoomChanging("tele");
-                }
-                else {
-                    ptz.zoom_stop();
-                    myZoomChanging("stop");
-                }
-            }
-        }
-
-        Button {
-            id: button_wide
-            text: qsTr("wide");
-            onPressedChanged: {
-                if (pressed) {
-                    ptz.zoom_wide(1);
-                    myZoomChanging("wide");
-                }
-                else {
-                    ptz.zoom_stop();
-                    myZoomChanging("stop");
-                }
-            }
-        }
-
-        ComboBox {
-            id: combo_preset_select;
-            width: 30
-            model: ["1", "2", "3", "4", "5", "6"];
-        }
-
-        Button {
-            id: button_preset_call;
-            text: qsTr("preset call");
-            onClicked: {
-                var idx = combo_preset_select.currentText;
-                myPreset("call", idx);
-                ptz.preset_call(idx);
-            }
-        }
-
-        Button {
-            id: button_preset_save;
-            text: qsTr("preset save");
-            onClicked: {
-                var idx = combo_preset_select.currentText;
-                myPreset("save", idx);
-                ptz.preset_save(idx);
-            }
-        }
-
-        Button {
-            id: button_preset_clear;
-            text: qsTr("preset clear");
-            onClicked: {
-                var idx = combo_preset_select.currentText;
-                myPreset("clear", idx);
-                ptz.preset_clear(idx);
-            }
+    Text {
+        id: text_preset;
+        x: 180
+        y: 40
+        color: "white"
+        text: "预制位:"
+        font {
+            pixelSize: 20
         }
     }
-    */
+
+    TextField {
+        id: input_preset_id
+        text: "1"
+        x: text_preset.x + text_preset.width + 10;
+        y: 20;
+        width: 40;
+        style: touchStyle_txt;
+        validator: IntValidator { bottom: 1; top: 12 }
+        font {
+            pixelSize: 20
+        }
+    }
+
+    Button {
+        id: button_preset_save;
+        text: "保存";
+        x: 180;
+        y: 80;
+        style: touchStyle_button;
+        onClicked: {
+            ptz.preset_save(input_preset_id.text);
+        }
+    }
+
+    Button {
+        id: button_preset_call;
+        text: "调用";
+        x: 180;
+        y: 120;
+        style: touchStyle_button;
+        onClicked: {
+            ptz.preset_call(input_preset_id.text);
+        }
+    }
+
+    Button {
+        id: button_preset_clr;
+        text: "删除";
+        x: 180
+        y: 160
+        style: touchStyle_button;
+        onClicked: {
+            ptz.preset_clear(input_preset_id.text);
+        }
+    }
 }

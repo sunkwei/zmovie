@@ -15,7 +15,7 @@ ColumnLayout {
 
     // 视频区 ..
     Loader {
-        id: players;
+        id: loader_players;
         Layout.alignment: Qt.AlignCenter
         Layout.fillWidth: true;
         Layout.preferredHeight: 320;
@@ -24,7 +24,7 @@ ColumnLayout {
 
     // 配置项编辑 ..
     Loader {
-        id: loader;
+        id: loader_config;
         Layout.fillWidth: true;
         Layout.fillHeight: true;
         anchors.bottom: parent.bottom;
@@ -32,26 +32,40 @@ ColumnLayout {
 
         Component.onCompleted: {
             if (who == "teacher") {
-                loader.setSource("MyTeacherConfig.qml", { "kvc": kvc, "player": players});
+                loader_config.setSource("MyTeacherConfig.qml", { "kvc": kvc, "player": loader_players});
             }
             else if (who == "student") {
-                loader.setSource("MyStudentConfig.qml", { "kvc": kvc, "player": players });
+                loader_config.setSource("MyStudentConfig.qml", { "kvc": kvc, "player": loader_players });
             }
             else if (who == "bd") {
-                loader.setSource("MyBDConfig.qml", { "kvc": kvc, "player": players });
+                loader_config.setSource("MyBDConfig.qml", { "kvc": kvc, "player": loader_players });
             }
         }
     }
 
+    function save()
+    {
+        // 保存所有 ...
+        loader_players.item.save();
+        loader_config.item.save();
+    }
+
+    function cancel()
+    {
+        // 放弃修改 ...
+        loader_players.item.cancel();
+        loader_config.item.cancel();
+    }
+
     Component.onCompleted: {
         if (who == "teacher") {
-            players.setSource("MyPlayersTeacher.qml");
+            loader_players.setSource("MyPlayersTeacher.qml");
         }
         else if (who == "student") {
-            players.setSource("MyPlayersStudent.qml");
+            loader_players.setSource("MyPlayersStudent.qml");
         }
         else if (who == "bd") {
-            players.setSource("MyPlayersBD.qml");
+            loader_players.setSource("MyPlayersBD.qml");
         }
     }
 }

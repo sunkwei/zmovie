@@ -26,13 +26,7 @@ void MediaThread::run()
 {
     ffmpegWrap fr(url_.c_str(), this);
     while (!quit_) {
-        int rc = fr.run_once();
-        if (rc != ffmpegWrap::RC_OK) {
-            // TODO: 等待下一步 ...
-            while (!quit_) {
-                msleep(30);
-            }
-        }
+        int rc = fr.run_once(true);
     }
 
     qDebug("mediaThread terminated!");

@@ -39,7 +39,7 @@ public:
     ~ffmpegWrap();
 
     /** 需要调用者不停地调用 .... */
-    int run_once();
+    int run_once(bool retry_open = true);
 
 private:
     int open_url();

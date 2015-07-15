@@ -21,7 +21,7 @@ BorderImage {
 
         ColumnLayout {
             id: teachers_config;
-            height: 500;  // 包含数个 MyKVPair + Button 的高度和 ..
+            height: 750;  // 包含数个 MyKVPair + Button 的高度和 ..
 
             // 云台服务 ..
             MyKVPair {
@@ -92,75 +92,28 @@ BorderImage {
                 desc: "一般选择 40";
             }
 
-
-            // 保存配置，并且返回 ..
-            Button {
-                text: "保存设置并返回";
-                style: touchStyle;
-
-                onClicked: {
-                    focus = true;   // 这样能强制使 ...
-
-                    if (player) {
-                        player.item.save();
-                    }
-
-                    if (kvc.save() < 0) {
-                        infos.text = "保存配置参数失败!!!!";
-                    }
-                    else {
-                        infos.text = "保存配置成功";
-                    }
-
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                }
+            MyKVPair {
+                id: id_kv_y_adjust;
+                title: "是否支持教师身高微调";
+                key: "y_adjust";
+                value: kvc.get(key);
+                desc: "0 不启用，1 启用，默认 0";
             }
 
-            // 放弃保存
-            Button {
-                text: "放弃设置并返回";
-                style: touchStyle;
-
-                onClicked: {
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                    if (kvc.reload() < 0) {
-                        infos.text = "重新加载配置失败!!!!";
-                    }
-                    else {
-                        infos.text = "已经取消保存";
-                    }
-                }
+            MyKVPair {
+                id: id_kv_y_adjust_threshold;
+                title: "启用身高微调阈值"
+                key: "y_adjust_threshold";
+                value: kvc.get(key);
+                desc: "当老师高度变化大于该值时才进行调整";
             }
 
-            Component {
-                id: touchStyle
-                ButtonStyle {
-                    panel: Item {
-                        implicitHeight: 30
-                        implicitWidth: 260
-                        BorderImage {
-                            anchors.fill: parent
-                            antialiasing: true
-                            border.bottom: 8
-                            border.top: 8
-                            border.left: 8
-                            border.right: 8
-                            anchors.margins: control.pressed ? -4 : 0
-                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
-                            Text {
-                                text: control.text
-                                anchors.centerIn: parent
-                                color: "white"
-                                font.pixelSize: 19
-                                renderType: Text.NativeRendering
-                            }
-                        }
-                    }
-                }
+            MyKVPair {
+                id: id_kv_y_adjust_factor10_;
+                title: "教师高度调节的幅度";
+                key: "y_adjust_factor10_";
+                value: kvc.get(key);
+                desc: "老师高度调整时，调整的幅度, 一般1到30就可以了，1基本不动，30动的幅度比较大";
             }
         }
     }
@@ -168,5 +121,25 @@ BorderImage {
         if (infos) {
             infos.text = "正在进行教师标定";
         }
+    }
+
+    Component.onDestruction: {
+
+    }
+
+    function save()
+    {
+        if (kvc.save() < 0) {
+            infos.text = "保存配置参数失败!!!!";
+        }
+        else {
+            infos.text = "保存配置成功";
+        }
+    }
+
+    function cancel()
+    {
+        kvc.reload();
+        infos.text = "已经取消";
     }
 }

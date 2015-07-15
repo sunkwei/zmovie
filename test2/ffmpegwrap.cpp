@@ -14,6 +14,8 @@ public:
 
     static void log(void *avcl, int level, const char *fmt, va_list args)
     {
+        return ;
+
         char line[1024];
         int print_prefix = 1;
         av_log_format_line(avcl, level, fmt, args, line, sizeof(line), &print_prefix);
@@ -48,7 +50,7 @@ ffmpegWrap::~ffmpegWrap()
     }
 }
 
-int ffmpegWrap::run_once()
+int ffmpegWrap::run_once(bool retry)
 {
     if (!ic_) {
         if (open_url() < 0) {
@@ -56,13 +58,26 @@ int ffmpegWrap::run_once()
         }
     }
 
-    return next_frame();
+    int rc = next_frame();
+    if (rc < 0 && retry) {
+        avformat_close_input(&ic_);
+        ic_ = 0;
+        if (open_url() < 0) {
+            return RC_FAILURE;
+        }
+
+        return next_frame();
+    }
+    else {
+        return rc;
+    }
 }
 
 int ffmpegWrap::open_url()
 {
     AVDictionary *dict = 0;
     av_dict_set(&dict, "stimeout", "2000000", 0);	// stimeout 为 tcp io 超时，微秒
+    av_dict_set(&dict, "rtsp_transport", "tcp", 1);
     int rc = avformat_open_input(&ic_, url_.c_str(), 0, &dict);
     av_dict_free(&dict);
     if (rc != 0) {

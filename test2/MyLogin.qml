@@ -118,7 +118,8 @@ Item {
                             border.left: 8
                             border.right: 8
                             anchors.margins: control.pressed ? -4 : 0
-                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
+                            source: control.pressed ? "images/button_pressed.png" : control.hovered ?
+                                                          "images/button_hover.png" : "images/button_default.png";
                             Text {
                                 text: control.text
                                 anchors.centerIn: parent

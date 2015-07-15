@@ -50,6 +50,25 @@ BorderImage {
                 desc: "输入录播机教师特写的直播流地址，支持rtsp/rtmp两种格式";
             }
 
+            /**
+            // video_width, video_height
+            MyKVPair {
+                id: id_kv_video_width;
+                title: "探测源视频宽";
+                key: "video_width";
+                value: kvc.get(key);
+                desc: "探测源宽度，保证480，不要修改!!!";
+            }
+
+            MyKVPair {
+                id: id_kv_video_hegiht;
+                title: "探测源视频高";
+                key: "video_height";
+                value: kvc.get(key);
+                desc: "探测源高度，保证270，不要修改!!!";
+            }
+            */
+
             // thres_dis
             MyKVPair {
                 id: id_kv_thres_dis;
@@ -159,80 +178,44 @@ BorderImage {
                 desc: "一般2.0，如果发现站立后左右晃动容易误判为坐下，则增加这个值";
             }
 
-            // 保存配置，并且返回 ..
-            Button {
-                text: "save & back";
-                style: touchStyle;
-
-                onClicked: {
-                    focus = true;   // 这样能强制使 ...
-
-                    if (player) {
-                        player.item.save();
-                    }
-
-                    if (kvc.save() < 0) {
-                        infos.text = "保存配置参数失败!!!!";
-                    }
-                    else {
-                        infos.text = "保存配置成功";
-                    }
-
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                }
+            MyKVPair {
+                id: id_kv_up_aspect;
+                title: "前后晃动系数";
+                key: "up_aspect";
+                value: kvc.get(key);
+                desc: "一般设置为1.0，如果发现坐下后，前后晃动导致误检为站立，则减小该值";
             }
 
-            // 放弃保存
-            Button {
-                text: "cancel";
-                style: touchStyle;
-
-                onClicked: {
-                    if (stackView) {
-                        stackView.pop();
-                    }
-                    if (kvc.reload() < 0) {
-                        infos.text = "重新加载配置失败!!!!";
-                    }
-                    else {
-                        infos.text = "已经取消保存";
-                    }
-                }
-            }
-
-            Component {
-                id: touchStyle
-                ButtonStyle {
-                    panel: Item {
-                        implicitHeight: 30
-                        implicitWidth: 260
-                        BorderImage {
-                            anchors.fill: parent
-                            antialiasing: true
-                            border.bottom: 8
-                            border.top: 8
-                            border.left: 8
-                            border.right: 8
-                            anchors.margins: control.pressed ? -4 : 0
-                            source: control.pressed ? "../images/button_pressed.png" : "../images/button_default.png"
-                            Text {
-                                text: control.text
-                                anchors.centerIn: parent
-                                color: "white"
-                                font.pixelSize: 19
-                                renderType: Text.NativeRendering
-                            }
-                        }
-                    }
-                }
+            MyKVPair {
+                id: id_kv_debug_log;
+                title: "是否记录日志";
+                key: "debug_log";
+                value: kvc.get(key);
+                desc: "1 启用日志，0 禁用日志，日志将保存在 runtime\bin\detlog\ 目录下";
             }
         }
     }
+
     Component.onCompleted: {
         if (infos) {
             infos.text = "正在进行学生标定";
         }
+    }
+
+    function save()
+    {
+
+        if (kvc.save() < 0) {
+            infos.text = "保存配置参数失败!!!!";
+        }
+        else {
+            infos.text = "保存配置成功";
+        }
+    }
+
+    function cancel()
+    {
+        kvc.reload();
+        infos.text = "已经取消";
     }
 }
