@@ -21,5 +21,7 @@
         <file>MyBDConfig.qml</file>
         <file>MyPlayersBD.qml</file>
         <file>images/button_hover.png</file>
+        <file>MyPlayersStudentFlip.qml</file>
+        <file>MyStudentFlipConfig.qml</file>
     </qresource>
 </RCC>

@@ -68,46 +68,7 @@ ApplicationWindow {
         source: "images/toolbar.png"
         width: parent.width
         height: 50
-/*
-        Rectangle {
-            id: backButton
-            width: opacity ? 30 : 0
-            anchors.left: parent.left
-            anchors.leftMargin: 20
-            opacity: stackView.depth > 1 ? 1 : 0
-            anchors.verticalCenter: parent.verticalCenter
-            antialiasing: true
-            height: 30
-            radius: 4
-            color: backmouse.pressed ? "#222" : "transparent";
-            Behavior on opacity { NumberAnimation{} }
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                source: "images/navigation_previous_item.png"
-            }
-            MouseArea {
-                id: backmouse
-                anchors.fill: parent
-                anchors.margins: -10
-                onClicked: {
-                    if (infos) {
-                        infos.text = "";
-                    }
 
-                    stackView.pop()
-                }
-            }
-        }
-
-        Text {
-            font.pixelSize: 21
-            Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
-            x: backButton.x + backButton.width + 20
-            anchors.verticalCenter: parent.verticalCenter
-            color: "white"
-            text: qsTr("login")
-        }
-*/
         RowLayout {
             spacing: 20;
             anchors.centerIn: parent;
@@ -265,6 +226,10 @@ ApplicationWindow {
                 var ip = login.ip;
                 var who = login.who;
                 var fname = who + "_detect_trace.config";
+                if (who === "flipped") {
+                    fname = "student_detect_trace.config"; // 翻转课堂，使用学生配置 ...
+                }
+
                 var config_url = "http://" + ip + ":8888/config/" + fname;
 
                 target_ip = ip;

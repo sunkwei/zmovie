@@ -40,6 +40,9 @@ ColumnLayout {
             else if (who == "bd") {
                 loader_config.setSource("MyBDConfig.qml", { "kvc": kvc, "player": loader_players });
             }
+            else if (who == "flipped") {
+                loader_config.setSource("MyStudentFlipConfig.qml", { "kvc": kvc, "player": loader_players} );
+            }
         }
     }
 
@@ -66,6 +69,9 @@ ColumnLayout {
         }
         else if (who == "bd") {
             loader_players.setSource("MyPlayersBD.qml");
+        }
+        else if (who == "flipped") {
+            loader_players.setSource("MyPlayersStudentFlip.qml");
         }
     }
 }

@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.1
 import zonekey.qd 1.4
 import QtQuick.Controls.Styles 1.2
 
-/** 教师标定属性 ... */
+/** 标定属性 ... */
 
 BorderImage {
     id: sv;
@@ -206,7 +206,7 @@ BorderImage {
 
     Component.onCompleted: {
         if (infos) {
-            infos.text = "正在进行学生标定";
+            infos.text = "正在进行学生(翻转课堂)标定";
         }
     }
 

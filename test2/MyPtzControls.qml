@@ -14,6 +14,7 @@ BorderImage {
     signal myPreset(string cmd, int idx);
 
     Component.onCompleted: {
+        spin_speed.value = 1;
     }
 
     property Ptz ptz;
@@ -81,7 +82,7 @@ BorderImage {
         onPressedChanged: {
             if (pressed) {
                 myPanTiltMoving("up")
-                ptz.up(1);
+                ptz.up(spin_speed.value);
             }
             else {
                 ptz.stop();
@@ -99,7 +100,7 @@ BorderImage {
         onPressedChanged: {
             if (pressed) {
                 myPanTiltMoving("left");
-                ptz.left(1);
+                ptz.left(spin_speed.value);
             }
             else {
                 ptz.stop();
@@ -117,7 +118,7 @@ BorderImage {
         onPressedChanged: {
             if (pressed) {
                 myPanTiltMoving("right");
-                ptz.right(1);
+                ptz.right(spin_speed.value);
             }
             else {
                 ptz.stop();
@@ -135,7 +136,7 @@ BorderImage {
         onPressedChanged: {
             if (pressed) {
                 myPanTiltMoving("down");
-                ptz.down(1);
+                ptz.down(spin_speed.value);
             }
             else {
                 ptz.stop();
@@ -180,60 +181,84 @@ BorderImage {
         }
     }
 
+    // 右侧显示转动速度 ...
     Text {
-        id: text_preset;
+        id: text_speed;
         x: 180
         y: 40
         color: "white"
-        text: "预制位:"
+        text: "速度:"
         font {
             pixelSize: 20
         }
     }
 
-    TextField {
-        id: input_preset_id
-        text: "1"
-        x: text_preset.x + text_preset.width + 10;
-        y: 20;
-        width: 40;
-        style: touchStyle_txt;
-        validator: IntValidator { bottom: 1; top: 12 }
+    SpinBox {
+        id: spin_speed;
+        maximumValue: 7;
+        minimumValue: 1;
+        x: text_speed.x + text_speed.width + 10;
+        y: 40;
+        width: 50;
         font {
-            pixelSize: 20
+            pixelSize: 20;
         }
     }
 
-    Button {
-        id: button_preset_save;
-        text: "保存";
-        x: 180;
-        y: 80;
-        style: touchStyle_button;
-        onClicked: {
-            ptz.preset_save(input_preset_id.text);
-        }
-    }
+//    Text {
+//        id: text_preset;
+//        x: 180
+//        y: 40
+//        color: "white"
+//        text: "预制位:"
+//        font {
+//            pixelSize: 20
+//        }
+//    }
 
-    Button {
-        id: button_preset_call;
-        text: "调用";
-        x: 180;
-        y: 120;
-        style: touchStyle_button;
-        onClicked: {
-            ptz.preset_call(input_preset_id.text);
-        }
-    }
+//    TextField {
+//        id: input_preset_id
+//        text: "1"
+//        x: text_preset.x + text_preset.width + 10;
+//        y: 20;
+//        width: 40;
+//        style: touchStyle_txt;
+//        validator: IntValidator { bottom: 1; top: 12 }
+//        font {
+//            pixelSize: 20
+//        }
+//    }
 
-    Button {
-        id: button_preset_clr;
-        text: "删除";
-        x: 180
-        y: 160
-        style: touchStyle_button;
-        onClicked: {
-            ptz.preset_clear(input_preset_id.text);
-        }
-    }
+//    Button {
+//        id: button_preset_save;
+//        text: "保存";
+//        x: 180;
+//        y: 80;
+//        style: touchStyle_button;
+//        onClicked: {
+//            ptz.preset_save(input_preset_id.text);
+//        }
+//    }
+
+//    Button {
+//        id: button_preset_call;
+//        text: "调用";
+//        x: 180;
+//        y: 120;
+//        style: touchStyle_button;
+//        onClicked: {
+//            ptz.preset_call(input_preset_id.text);
+//        }
+//    }
+
+//    Button {
+//        id: button_preset_clr;
+//        text: "删除";
+//        x: 180
+//        y: 160
+//        style: touchStyle_button;
+//        onClicked: {
+//            ptz.preset_clear(input_preset_id.text);
+//        }
+//    }
 }

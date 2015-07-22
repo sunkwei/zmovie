@@ -36,8 +36,8 @@ Item {
     // pop upd
     BorderImage {
         id: login_wnd
-        width: 450
-        height: 300
+        width: 405
+        height: 350
         anchors.centerIn: parent
         border.bottom: 8
         source: "images/toolbar.png"
@@ -99,6 +99,18 @@ Item {
 
                 onClicked: {
                     who = "bd";
+                    ip = target_ip.text;
+                    myOk();
+                }
+            }
+
+            Button {
+                text: "翻转课堂";
+                style: touchStyle;
+                Layout.alignment: Qt.AlignHCenter;
+
+                onClicked: {
+                    who = "flipped";
                     ip = target_ip.text;
                     myOk();
                 }
